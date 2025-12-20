@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum TransactionType {
+  DEPOSIT // Nạp VND
+  WITHDRAW // Rút VND
+  BUY_STOCK // Dùng VND mua Token
+  SELL_STOCK // Bán Token đổi VND
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum InventoryAction {
+  IMPORT // Mua thêm cổ thật
+  EXPORT // Bán bớt cổ thật
+}
+
+enum KycRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ==================== MODELS ====================
+
+/// Lưu thông tin định danh và ví tiền off-chain (VND)
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique // Địa chỉ ví Metamask (để whitelist)
+  fullName      String // Tên thật trên CCCD (Name Matching với Bank)
+  vndBalance    Float    @default(0) // Số dư VND trong hệ thống (Off-chain)
+  kycStatus     KycStatus @default(PENDING)
+  isWhitelisted Boolean  @default(false) // Đã được add vào Smart Contract chưa?
+  createdAt     DateTime @default(now())
+
+  // Relations
+  transactions Transaction[]
+  kycRequests  KYCRequest[]
+}
+
+/// Sổ cái quan trọng nhất, lưu mọi dòng tiền ra vào
+model Transaction {
+  id          String            @id @default(cuid())
+  userId      String
+  stockSymbol String? // "TSLA"
+  stockPrice  Float? // Giá tại thời điểm khớp lệnh (VND)
+  type        TransactionType
+  amountVND   Float // Số tiền VND liên quan
+  amountToken Float? // Số lượng Token cổ phiếu (nếu Mua/Bán)
+  status      TransactionStatus @default(PENDING)
+  txHash      String? // Hash trên blockchain (nếu liên quan đến Token)
+  refCode     String? // Mã tham chiếu từ VNPay (để đối soát)
+  createdAt   DateTime          @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+}
+
+/// Dùng để Admin quản lý tài sản thực và đối soát Proof of Reserve (PoR)
+model StockInventory {
+  symbol       String   @id // Mã cổ phiếu (ví dụ: "TSLA")
+  realShares   Float    @default(0) // Số lượng cổ phiếu thật trong tài khoản chứng khoán
+  mintedTokens Float    @default(0) // Số lượng Token đã mint trên blockchain
+  currentPrice Float    @default(0) // Giá hiện tại (từ Oracle/API)
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  inventoryLogs InventoryLog[]
+}
+
+/// Sổ cái nhập/xuất kho của Admin
+model InventoryLog {
+  id        String          @id @default(cuid())
+  adminId   String // Ai là người nhập? (Để quy trách nhiệm)
+  symbol    String // Mã cổ phiếu ("TSLA")
+  action    InventoryAction // IMPORT hoặc EXPORT
+  quantity  Float // Số lượng
+  proofUrl  String // Link ảnh/PDF bằng chứng
+  txHash    String? // Hash của lệnh mint hoặc burn tương ứng
+  createdAt DateTime        @default(now())
+
+  // Relations
+  stockInventory StockInventory @relation(fields: [symbol], references: [symbol])
+
+  @@index([symbol])
+  @@index([adminId])
+}
+
+/// Lưu trữ thông tin giấy tờ user gửi lên để Admin duyệt
+model KYCRequest {
+  id               String           @id @default(cuid())
+  userId           String
+  idCardNumber     String // Số CCCD/Passport
+  idCardImageFront String // Link ảnh mặt trước
+  idCardImageBack  String // Link ảnh mặt sau
+  selfieImage      String // Link ảnh selfie
+  status           KycRequestStatus @default(PENDING)
+  adminNote        String? // Ghi chú của Admin
+  createdAt        DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+

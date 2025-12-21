@@ -1,5 +1,5 @@
 import { Prisma, StockInventory } from '@/app/generated/prisma'
-import { prisma } from '@/lib/primas'
+import { prisma } from '@/lib/prisma'
 
 // ==================== Types ====================
 

@@ -1,5 +1,5 @@
 import { KYCRequest, KycRequestStatus, Prisma } from '@/app/generated/prisma'
-import { prisma } from '@/lib/primas'
+import { prisma } from '@/lib/prisma'
 
 // ==================== Types ====================
 

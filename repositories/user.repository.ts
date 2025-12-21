@@ -1,5 +1,5 @@
 import { KycStatus, Prisma, User } from '@/app/generated/prisma'
-import { prisma } from '@/lib/primas'
+import { prisma } from '@/lib/prisma'
 
 // ==================== Types ====================
 

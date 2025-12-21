@@ -1,10 +1,10 @@
 import {
-    Prisma,
-    Transaction,
-    TransactionStatus,
-    TransactionType,
+  Prisma,
+  Transaction,
+  TransactionStatus,
+  TransactionType,
 } from '@/app/generated/prisma'
-import { prisma } from '@/lib/primas'
+import { prisma } from '@/lib/prisma'
 
 // ==================== Types ====================
 

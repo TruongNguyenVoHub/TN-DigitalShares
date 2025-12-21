@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "types/api-reponse.type"  ],
   "exclude": ["node_modules"]
 }

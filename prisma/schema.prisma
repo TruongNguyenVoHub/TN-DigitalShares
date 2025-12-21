@@ -53,6 +53,7 @@ model User {
   vndBalance    Float    @default(0) // Số dư VND trong hệ thống (Off-chain)
   kycStatus     KycStatus @default(PENDING)
   isWhitelisted Boolean  @default(false) // Đã được add vào Smart Contract chưa?
+  role          String   @default("USER") // USER hoặc ADMIN
   createdAt     DateTime @default(now())
 
   // Relations

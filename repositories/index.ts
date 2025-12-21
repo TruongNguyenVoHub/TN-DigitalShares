@@ -19,7 +19,7 @@ export type {
     CreateStockInventoryInput,
     UpdateStockInventoryInput
 } from './stock-inventory.repository'
-export type { } from './stock-token.blockchain.repository'
+export type { ApproveParams, BurnParams, MintParams, RoleParams, SetWhitelistedParams, TransferFromParams, TransferParams } from './stock-token.blockchain.repository'
 export type {
     CreateTransactionInput,
     UpdateTransactionInput

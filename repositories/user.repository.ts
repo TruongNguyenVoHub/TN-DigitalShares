@@ -9,6 +9,7 @@ export type CreateUserInput = {
   vndBalance?: number
   kycStatus?: KycStatus
   isWhitelisted?: boolean
+  role?: string
 }
 
 export type UpdateUserInput = Partial<Omit<CreateUserInput, 'walletAddress'>>

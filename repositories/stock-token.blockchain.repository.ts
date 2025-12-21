@@ -82,12 +82,12 @@ export class StockTokenRepository {
             transport: http(rpcUrl),
         });
 
-        const privateKey = process.env.WALLET_PRIVATE_KEY;
+        const privateKey = process.env.SEPOLIA_PRIVATE_KEY;
         if (!privateKey) {
-            throw new Error("WALLET_PRIVATE_KEY is required in environment variables");
+            throw new Error("SEPOLIA_PRIVATE_KEY is required in environment variables");
         }
 
-        this.account = privateKeyToAccount(privateKey as `0x${string}`);
+        this.account = privateKeyToAccount(`0x${privateKey}` as `0x${string}`);
         this.walletClient = createWalletClient({
             account: this.account,
             chain: sepolia,

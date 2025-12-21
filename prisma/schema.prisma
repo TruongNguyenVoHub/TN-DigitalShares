@@ -85,8 +85,8 @@ model Transaction {
 
 /// Dùng để Admin quản lý tài sản thực và đối soát Proof of Reserve (PoR)
 model StockInventory {
-  symbol       String   @id // Mã cổ phiếu (ví dụ: "TSLA")
-  realShares   Float    @default(0) // Số lượng cổ phiếu thật trong tài khoản chứng khoán
+  symbol       String   @id // 
+  realShares   Float    @default(0) // Số lượng cổ phiếu thật trong tài khoản
   mintedTokens Float    @default(0) // Số lượng Token đã mint trên blockchain
   currentPrice Float    @default(0) // Giá hiện tại (từ Oracle/API)
   updatedAt    DateTime @updatedAt

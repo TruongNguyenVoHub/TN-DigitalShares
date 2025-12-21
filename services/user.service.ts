@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { userRepository } from "@/repositories";
 type ApiResponse<T = undefined> = {
     success: boolean;
     status: number;
@@ -27,19 +27,15 @@ export class UserService {
         }
         
         // Find existing user
-        let user = await prisma.user.findUnique({
-            where: { walletAddress },
-        });
+        let user = await userRepository.findByWalletAddress(walletAddress);
         // If user doesn't exist, create new one
         if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    walletAddress,
-                    fullName: "",
-                    kycStatus: "PENDING",
-                    role: "USER",
-                    isWhitelisted: false,
-                },
+            user = await userRepository.create({
+                walletAddress,
+                fullName: "",
+                kycStatus: "PENDING",
+                isWhitelisted: false,
+                role: "USER",
             });
         }
         return {

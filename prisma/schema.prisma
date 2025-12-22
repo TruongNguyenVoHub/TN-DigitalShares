@@ -59,6 +59,10 @@ model User {
   // Relations
   transactions Transaction[]
   kycRequests  KYCRequest[]
+
+  
+  sentTransfers     TokenTransfer[] @relation("Sender")
+  receivedTransfers TokenTransfer[] @relation("Receiver")
 }
 
 /// Sổ cái quan trọng nhất, lưu mọi dòng tiền ra vào
@@ -104,6 +108,7 @@ model InventoryLog {
   quantity  Float // Số lượng
   proofUrl  String // Link ảnh/PDF bằng chứng
   txHash    String? // Hash của lệnh mint hoặc burn tương ứng
+  status   TransactionStatus @default(PENDING)
   createdAt DateTime        @default(now())
 
   // Relations
@@ -131,4 +136,23 @@ model KYCRequest {
   @@index([userId])
   @@index([status])
 }
+/// Lưu lịch sử chuyển Token P2P giữa các user (Do Event Listener ghi vào)
+model TokenTransfer {
+  id          String   @id @default(cuid())
+  
+  fromUserId  String
+  fromUser    User     @relation("Sender", fields: [fromUserId], references: [id])
+  
+  toUserId    String
+  toUser      User     @relation("Receiver", fields: [toUserId], references: [id])
+  
+  amount      Float    // Số lượng Token chuyển
+  symbol      String   @default("TNT") // Mã token
+  txHash      String   // Hash trên blockchain (để tra cứu)
+  blockNumber Int?     // Lưu lại block số mấy (để sort hoặc debug)
+  
+  createdAt   DateTime @default(now())
 
+  @@index([fromUserId])
+  @@index([toUserId])
+}

@@ -23,7 +23,7 @@ export const userRepository = {
   async create(data: CreateUserInput): Promise<User> {
     return prisma.user.create({
       data: {
-        walletAddress: data.walletAddress,
+        walletAddress: data.walletAddress.toLowerCase(),
         fullName: data.fullName,
         vndBalance: data.vndBalance ?? 0,
         kycStatus: data.kycStatus ?? 'PENDING',
@@ -59,7 +59,7 @@ export const userRepository = {
    */
   async findByWalletAddress(walletAddress: string): Promise<User | null> {
     return prisma.user.findUnique({
-      where: { walletAddress },
+      where: { walletAddress: walletAddress.toLowerCase() },
     })
   },
 
@@ -177,7 +177,7 @@ export const userRepository = {
    */
   async existsByWalletAddress(walletAddress: string): Promise<boolean> {
     const count = await prisma.user.count({
-      where: { walletAddress },
+      where: { walletAddress: walletAddress.toLowerCase() },
     })
     return count > 0
   },

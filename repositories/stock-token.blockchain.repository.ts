@@ -6,10 +6,13 @@ import {
     formatUnits,
     getContract,
     http,
+    parseEventLogs,
     parseUnits,
     type Address,
     type Hash,
+    type Log,
     type PublicClient,
+    type TransactionReceipt,
     type WalletClient,
 } from "viem";
 import { privateKeyToAccount, type PrivateKeyAccount } from "viem/accounts";
@@ -422,6 +425,115 @@ export class StockTokenRepository {
                 admin: hasAdminRole,
             },
         };
+    }
+
+    // ==================== Verification Methods for Deposit ====================
+
+    /**
+     * Lấy transaction receipt từ blockchain
+     */
+    async getTransactionReceipt(txHash: Hash): Promise<TransactionReceipt> {
+        return await this.publicClient.getTransactionReceipt({ hash: txHash });
+    }
+
+    /**
+     * Parse Transfer event từ transaction logs
+     * Trả về thông tin: from, to, value
+     */
+    async parseTransferEvent(logs: Log[]): Promise<{
+        from: Address;
+        to: Address;
+        value: number;
+    } | null> {
+        try {
+            // Parse ERC20 Transfer event
+            const parsedLogs = parseEventLogs({
+                abi: StockTokenABI.abi,
+                logs: logs,
+                eventName: 'Transfer',
+            });
+
+            if (parsedLogs.length === 0) {
+                return null;
+            }
+
+            // Lấy Transfer event đầu tiên
+            const transferEvent = parsedLogs[0];
+            
+            return {
+                from: transferEvent.args.from as Address,
+                to: transferEvent.args.to as Address,
+                value: this.fromWei(transferEvent.args.value as bigint),
+            };
+        } catch (error) {
+            console.error('Error parsing Transfer event:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Verify transaction cho deposit token
+     * Kiểm tra: status, from, to, value
+     */
+    async verifyDepositTransaction(
+        txHash: Hash,
+        expectedFrom: Address,
+        expectedTo: Address
+    ): Promise<{
+        success: boolean;
+        message: string;
+        amountToken?: number;
+    }> {
+        try {
+            // 1. Lấy receipt
+            const receipt = await this.getTransactionReceipt(txHash);
+
+            // 2. Check status
+            if (receipt.status !== 'success') {
+                return {
+                    success: false,
+                    message: 'Transaction failed on blockchain',
+                };
+            }
+
+            // 3. Parse Transfer event
+            const transferEvent = await this.parseTransferEvent(receipt.logs);
+            if (!transferEvent) {
+                return {
+                    success: false,
+                    message: 'No Transfer event found in transaction',
+                };
+            }
+
+            // 4. Verify from address
+            if (transferEvent.from.toLowerCase() !== expectedFrom.toLowerCase()) {
+                return {
+                    success: false,
+                    message: 'Transaction sender does not match',
+                };
+            }
+
+            // 5. Verify to address
+            if (transferEvent.to.toLowerCase() !== expectedTo.toLowerCase()) {
+                return {
+                    success: false,
+                    message: 'Transaction receiver does not match company wallet',
+                };
+            }
+
+            // 6. All checks passed
+            return {
+                success: true,
+                message: 'Transaction verified successfully',
+                amountToken: transferEvent.value,
+            };
+        } catch (error) {
+            console.error('Error verifying deposit transaction:', error);
+            return {
+                success: false,
+                message: 'Failed to verify transaction',
+            };
+        }
     }
 }
 

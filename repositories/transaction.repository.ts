@@ -56,6 +56,17 @@ export const transactionRepository = {
   },
 
   /**
+   * Tìm giao dịch theo txHash (chống duplicate deposit)
+   */
+  async findByTxHash(txHash: string): Promise<Transaction | null> {
+    return prisma.transaction.findFirst({
+      where: {
+        txHash: txHash,
+      },
+    })
+  },
+
+  /**
    * Tìm giao dịch theo ID kèm user
    */
   async findByIdWithUser(id: string): Promise<Transaction | null> {
@@ -162,14 +173,14 @@ export const transactionRepository = {
     })
   },
 
-  /**
-   * Tìm giao dịch theo txHash (Blockchain)
-   */
-  async findByTxHash(txHash: string): Promise<Transaction | null> {
-    return prisma.transaction.findFirst({
-      where: { txHash },
-    })
-  },
+  // /**
+  //  * Tìm giao dịch theo txHash (Blockchain)
+  //  */
+  // async findByTxHash(txHash: string): Promise<Transaction | null> {
+  //   return prisma.transaction.findFirst({
+  //     where: { txHash },
+  //   })
+  // },
 
   /**
    * Lấy giao dịch PENDING (để xử lý)

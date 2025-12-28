@@ -17,6 +17,9 @@ const stockTokenRepository = new StockTokenRepository();
 
 export class TrandService {
     async buyToken(walletAddress: string, amountToken: number): Promise<TradeTokenResponse> {
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+        
         //lay gia token
         const tokenPrice = await stockTokenRepository.getLatestPrice() / BigInt(10 ** 7);
 
@@ -80,6 +83,9 @@ export class TrandService {
     }
 
     async sellToken(walletAddress: string, amountToken: number): Promise<TradeTokenResponse> {
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+        
         //lay gia token
         const tokenPrice = await stockTokenRepository.getLatestPrice() / BigInt(10 ** 7);
 

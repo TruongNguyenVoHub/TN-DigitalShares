@@ -64,6 +64,9 @@ export class UserService {
             };
         }
         
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+        
         // Find existing user
         let user = await userRepository.findByWalletAddress(walletAddress);
         // If user doesn't exist, create new one
@@ -98,6 +101,9 @@ export class UserService {
                 message: "Invalid wallet address or amount",
             };
         }
+
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
 
         const user = await userRepository.findByWalletAddress(walletAddress);
         if (!user) {
@@ -138,6 +144,9 @@ export class UserService {
             };
         }
 
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+
         const user = await userRepository.findByWalletAddress(walletAddress);
         if (!user) {
             return {
@@ -176,7 +185,114 @@ export class UserService {
         };
     }
 
+    async depositToken(walletAddress: string, txHash: string): Promise<TradeTokenResponse> {
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+        
+        // 1. Kiểm tra user tồn tại
+        const user = await userRepository.findByWalletAddress(walletAddress);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            };
+        }
+
+        // 2. Check xem txHash này đã được dùng để nạp tiền chưa (Chống Replay Attack)
+        const existingTx = await transactionRepository.findByTxHash(txHash);
+        if (existingTx) {
+            return {
+                success: false,
+                status: 400,
+                message: "Transaction hash already used. Cannot deposit twice with same transaction.",
+            };
+        }
+
+        // 3. Verify transaction trên blockchain
+        try {
+            const receipt = await stockTokenRepository.getTransactionReceipt(txHash as `0x${string}`);
+            
+            // 3.1. Check transaction status
+            if (receipt.status !== 'success') {
+                return {
+                    success: false,
+                    status: 400,
+                    message: "Transaction failed on blockchain",
+                };
+            }
+
+            // 3.2. Parse Transfer event logs
+            const transferEvent = await stockTokenRepository.parseTransferEvent(receipt.logs);
+            if (!transferEvent) {
+                return {
+                    success: false,
+                    status: 400,
+                    message: "No valid Transfer event found in transaction",
+                };
+            }
+
+            // 3.3. Verify sender (from) - phải là ví của user đang đăng nhập
+            if (transferEvent.from.toLowerCase() !== walletAddress.toLowerCase()) {
+                return {
+                    success: false,
+                    status: 403,
+                    message: "Transaction sender does not match your wallet address",
+                };
+            }
+
+            // 3.4. Verify receiver (to) - phải là ví công ty (treasury)
+            const treasuryAddress = await stockTokenRepository.getTreasuryAddress();
+            if (transferEvent.to.toLowerCase() !== treasuryAddress.toLowerCase()) {
+                return {
+                    success: false,
+                    status: 400,
+                    message: "Transaction was not sent to company wallet",
+                };
+            }
+
+            // 3.5. Lấy số lượng token từ event
+            const amountToken = transferEvent.value;
+            const oldToken = user.tokenBalance;
+
+            // 4. Mọi thứ OK -> Cộng token vào balance
+            user.tokenBalance += amountToken;
+            await userRepository.update(user.id, user);
+
+            // 5. Lưu giao dịch vào database
+            await transactionRepository.create({
+                userId: user.id,
+                type: "DEPOSIT_TOKEN_ONCHAIN",
+                amountToken: amountToken,
+                amountVND: 0,
+                txHash: txHash,
+                status: "SUCCESS",
+            });
+
+            return {
+                success: true,
+                status: 200,
+                message: "Token deposit successful",
+                data: {
+                    walletAddress,
+                    oldToken,
+                    newToken: user.tokenBalance,
+                    txHash,
+                },
+            };
+        } catch (error) {
+            console.error("Error verifying transaction:", error);
+            return {
+                success: false,
+                status: 500,
+                message: "Failed to verify transaction on blockchain",
+            };
+        }
+    }
     async withdrawToken(walletAddress: string, amountToken: number): Promise<TradeTokenResponse> {
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+        
         //tim user theo wallet address
         const user = await userRepository.findByWalletAddress(walletAddress);
         if (!user) {
@@ -223,6 +339,8 @@ export class UserService {
     }
 
     async kycSubmit(walletAddress: string, idCardNumber: string, idCardImageFront: string, idCardImageBack: string, selfieImage: string): Promise<KYCResponse> {
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
 
         //tim user theo wallet address
         const user = await userRepository.findByWalletAddress(walletAddress);

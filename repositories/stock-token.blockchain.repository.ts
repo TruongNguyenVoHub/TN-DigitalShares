@@ -121,6 +121,12 @@ export class StockTokenRepository {
     }
 
     // ==================== Read Functions ====================
+    /**
+     * lấy địa chỉ admin
+     */
+    async getTreasuryAddress(): Promise<Address> {
+        return this.account.address;
+    }
 
     /**
      * Lấy tên token

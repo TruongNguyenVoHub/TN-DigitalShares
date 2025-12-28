@@ -183,7 +183,7 @@ Lấy giá hiện tại của token cổ phiếu.
 Mua token cổ phiếu bằng VND.
 
 - **Method:** `POST`
-- **Endpoint:** `/api/trand/buy`
+- **Endpoint:** `/api/trade/buy`
 - **Headers:**
   ```json
   {

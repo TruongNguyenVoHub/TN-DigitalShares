@@ -24,6 +24,9 @@ enum TransactionType {
   WITHDRAW // Rút VND
   BUY_STOCK // Dùng VND mua Token
   SELL_STOCK // Bán Token đổi VND
+
+  WITHDRAW_TOKEN_ONCHAIN // Rút Token về ví
+  DEPOSIT_TOKEN_ONCHAIN  // Nạp Token lên sàn
 }
 
 enum TransactionStatus {

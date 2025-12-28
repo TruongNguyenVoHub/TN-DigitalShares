@@ -1,4 +1,4 @@
-import { kycRequestRepository, stockTokenRepository, transactionRepository, userRepository, type SetWhitelistedParams } from "@/repositories";
+import { kycRequestRepository, stockTokenRepository, transactionRepository, TransferParams, userRepository, type SetWhitelistedParams } from "@/repositories";
 interface BankInfo {
   bankName: string;
   accountNumber: string;
@@ -40,11 +40,19 @@ type KYCDecisionData = {
     reason?: string;
 };
 
+type TradeTokenData = {
+    walletAddress: string;
+    oldToken: number;
+    newToken: number;
+    txHash: string;
+}
+
 type LoginResponse = ApiResponse<LoginData>;
 type DepositResponse = ApiResponse<DepositData>;
 type WithdrawResponse = ApiResponse<WithdrawData>;
 type KYCResponse = ApiResponse<KYCData>;
 type KYCDecisionResponse = ApiResponse<KYCDecisionData>;
+type TradeTokenResponse = ApiResponse<TradeTokenData>;
 
 export class UserService {
     async login(walletAddress: string): Promise<LoginResponse> {
@@ -82,7 +90,7 @@ export class UserService {
         };
     }
 
-    async deposit(walletAddress: string, amount: number): Promise<DepositResponse> {
+    async depositVND(walletAddress: string, amount: number): Promise<DepositResponse> {
         if(!walletAddress || amount <= 0) {
             return {
                 success: false,
@@ -121,7 +129,7 @@ export class UserService {
         };
     }
 
-    async withdraw(walletAddress: string, amount: number, BankInfo: BankInfo): Promise<WithdrawResponse> {
+    async withdrawVND(walletAddress: string, amount: number, BankInfo: BankInfo): Promise<WithdrawResponse> {
         if(!walletAddress || amount <= 0) {
             return {
                 success: false,
@@ -164,6 +172,52 @@ export class UserService {
             data: {
                 walletAddress,
                 remainingBalance,
+            },
+        };
+    }
+
+    async withdrawToken(walletAddress: string, amountToken: number): Promise<TradeTokenResponse> {
+        //tim user theo wallet address
+        const user = await userRepository.findByWalletAddress(walletAddress);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            };
+        }
+        const oldToken = user.tokenBalance;
+
+        //goi blockchain de chuyen token den vi
+        const transfer = await stockTokenRepository.transferAndWait(<TransferParams>{
+            to: walletAddress,
+            amount: amountToken,
+        });
+        //doi cho den khi giao dich duoc xac nhan
+        const txHash = transfer;
+        user.tokenBalance -= amountToken;
+        await userRepository.update(user.id, user);
+
+        //luu giao dich vao bang transaction
+        await transactionRepository.create({
+            userId: user.id,
+            type: "WITHDRAW_TOKEN_ONCHAIN",
+            stockPrice: 0,
+            amountToken: amountToken,
+            amountVND: 0,
+            txHash: txHash,
+            status: "SUCCESS",
+        });
+
+        return {
+            success: true,
+            status: 200,
+            message: "Token withdraw successful",
+            data: {
+                walletAddress,
+                oldToken: oldToken, 
+                newToken: user.tokenBalance,
+                txHash,
             },
         };
     }

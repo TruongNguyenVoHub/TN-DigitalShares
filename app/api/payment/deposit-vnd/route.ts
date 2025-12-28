@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userService = new UserService();
-    const result = await userService.deposit(walletAddress, amount);
+    const result = await userService.depositVND(walletAddress, amount);
 
     if (!result.success) {
       return NextResponse.json(

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         );
     }
     const userService = new UserService();
-    const result = await userService.withdraw(walletAddress, amount, bankInfo);
+    const result = await userService.withdrawVND(walletAddress, amount, bankInfo);
 
     if (!result.success) {
         return NextResponse.json(

@@ -51,6 +51,7 @@ model User {
   walletAddress String   @unique // Địa chỉ ví Metamask (để whitelist)
   fullName      String // Tên thật trên CCCD (Name Matching với Bank)
   vndBalance    Float    @default(0) // Số dư VND trong hệ thống (Off-chain)
+  tokenBalance  Float    @default(0) // Số dư Token cổ phiếu trong hệ thống (Off-chain)
   kycStatus     KycStatus @default(PENDING)
   isWhitelisted Boolean  @default(false) // Đã được add vào Smart Contract chưa?
   role          String   @default("USER") // USER hoặc ADMIN

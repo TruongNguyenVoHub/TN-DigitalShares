@@ -262,6 +262,13 @@ export class StockTokenRepository {
         const hash = await this.contract.write.transferFrom([from, to, this.toWei(amount)]);
         return hash;
     }
+    /**
+     *  transfer và đợi trả về hash
+     */
+    async transferAndWait(params: TransferParams) {
+        const hash = await this.transfer(params);
+        return hash;
+    }
 
     /**
      * Approve cho địa chỉ khác xài token

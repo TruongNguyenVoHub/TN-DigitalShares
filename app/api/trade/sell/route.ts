@@ -1,4 +1,4 @@
-import { TrandService } from "@/services/trade.service";
+import { TradeService } from "@/services/trade.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const trandService = new TrandService();
-    const result = await trandService.sellToken(walletAddress, amountToken);
+    const tradeService = new TradeService();
+    const result = await tradeService.sellToken(walletAddress, amountToken);
 
     if (!result.success) {
       return NextResponse.json(

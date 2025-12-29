@@ -10,12 +10,28 @@ type TradeTokenData = {
     walletAddress: string;
     userToken: number;
 }
+
+type TransactionData = {
+    id: string;
+    userId: string;
+    stockSymbol?: string | null;
+    type: string;
+    stockPrice: number | null;
+    amountToken: number | null;
+    amountVND: number;
+    status: string;
+    txHash: string | null;
+    refCode?: string | null;
+    createdAt: Date;
+    updatedAt?: Date;
+}
 type TradeTokenResponse = ApiResponse<TradeTokenData>;
+type TransactionResponse = ApiResponse<TransactionData[]>;
 
 const stockTokenRepository = new StockTokenRepository();
 
 
-export class TrandService {
+export class TradeService {
     async buyToken(walletAddress: string, amountToken: number): Promise<TradeTokenResponse> {
         // Normalize wallet address to lowercase
         walletAddress = walletAddress.toLowerCase();
@@ -160,5 +176,24 @@ export class TrandService {
                 userToken: user.tokenBalance,
             },
         };
+    }
+
+    async getAllTransactions(): Promise<TransactionResponse> {
+        try {
+            const transactions = await transactionRepository.findAll();
+            return {
+                success: true,
+                status: 200,
+                message: "Transactions retrieved successfully",
+                data: transactions,
+            };
+        } catch (error) {
+            console.error("Error retrieving transactions:", error);
+            return {
+                success: false,
+                status: 500,
+                message: "Internal server error",
+            };
+        }
     }
 }

@@ -1,3 +1,4 @@
+import { TransactionType } from "@/app/generated/prisma";
 import { kycRequestRepository, stockTokenRepository, transactionRepository, TransferParams, userRepository, type SetWhitelistedParams } from "@/repositories";
 interface BankInfo {
   bankName: string;
@@ -47,12 +48,38 @@ type TradeTokenData = {
     txHash: string;
 }
 
+type UserProfileData ={
+    walletAddress: string;
+    fullName: string;
+    vndBalance: number;
+    tokenBalance: number;
+    kycStatus: string;
+    isWhitelisted: boolean;
+    role: string;
+}
+type UserTransactionData = {
+    transactions: Array<{
+        id: string;
+        type: TransactionType; // hoặc string
+        stockSymbol?: string; // Để biết giao dịch cổ phiếu nào (TSLA, AAPL...)
+        stockPrice?: number; // Giá khớp lệnh tại thời điểm giao dịch
+        amountVND: number; // Số tiền VND
+        amountToken?: number; // Số lượng token (nếu có)
+        status: string; // PENDING, SUCCESS, FAILED...
+        txHash?: string; // Hash blockchain (cho DEPOSIT/WITHDRAW_TOKEN_ONCHAIN)
+        refCode?: string; // Mã tham chiếu VNPay (cho DEPOSIT/WITHDRAW VND)
+        createdAt: string; // Thời gian giao dịch
+    }>;
+}
+
 type LoginResponse = ApiResponse<LoginData>;
 type DepositResponse = ApiResponse<DepositData>;
 type WithdrawResponse = ApiResponse<WithdrawData>;
 type KYCResponse = ApiResponse<KYCData>;
 type KYCDecisionResponse = ApiResponse<KYCDecisionData>;
 type TradeTokenResponse = ApiResponse<TradeTokenData>;
+type UserProfileResponse = ApiResponse<UserProfileData>;
+type UserTransactionResponse = ApiResponse<UserTransactionData>;
 
 export class UserService {
     async login(walletAddress: string): Promise<LoginResponse> {
@@ -89,6 +116,85 @@ export class UserService {
                 kycStatus: user.kycStatus,
                 isWhitelisted: user.isWhitelisted,
                 role: user.role,
+            },
+        };
+    }
+    async getUserProfile(walletAddress: string): Promise<UserProfileResponse> {
+        if(!walletAddress) {
+            return {
+                success: false,
+                status: 400,
+                message: "Wallet address is required",
+            };
+        }
+
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+
+        const user = await userRepository.findByWalletAddress(walletAddress);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            };
+        }
+
+        return {
+            success: true,
+            status: 200,
+            message: "User profile retrieved successfully",
+            data: {
+                walletAddress: user.walletAddress,
+                fullName: user.fullName,
+                vndBalance: user.vndBalance || 0,
+                tokenBalance: user.tokenBalance || 0,
+                kycStatus: user.kycStatus,
+                isWhitelisted: user.isWhitelisted,
+                role: user.role,
+            },
+        };
+    }
+    async getUserTransactions(walletAddress: string): Promise<UserTransactionResponse> {
+        if(!walletAddress) {
+            return {
+                success: false,
+                status: 400,
+                message: "Wallet address is required",
+            };
+        }
+
+        // Normalize wallet address to lowercase
+        walletAddress = walletAddress.toLowerCase();
+
+        const user = await userRepository.findByWalletAddress(walletAddress);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            };
+        }
+
+        const transactions = await transactionRepository.findByUserId(user.id);
+
+        return {
+            success: true,
+            status: 200,
+            message: "User transactions retrieved successfully",
+            data: {
+                transactions: transactions.map(tx => ({
+                    id: tx.id,
+                    type: tx.type,
+                    stockSymbol: tx.stockSymbol || undefined,
+                    stockPrice: tx.stockPrice || undefined,
+                    amountVND: tx.amountVND,
+                    amountToken: tx.amountToken || undefined,
+                    status: tx.status,
+                    txHash: tx.txHash || undefined,
+                    refCode: tx.refCode || undefined,
+                    createdAt: tx.createdAt.toISOString(),
+                })),
             },
         };
     }

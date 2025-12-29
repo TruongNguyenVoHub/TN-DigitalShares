@@ -28,7 +28,7 @@ export default function WalletPage() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [depositConfirmed, setDepositConfirmed] = useState(false);
 
-  const COMPANY_WALLET = process.env.NEXT_PUBLIC_TREASURY_WALLET || '0x...';
+  const COMPANY_WALLET = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || '0x...';
   const COMPANY_BANK = {
     name: 'Vietcombank',
     number: '1234567890',

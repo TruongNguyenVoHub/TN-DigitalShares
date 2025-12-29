@@ -3,46 +3,80 @@
 import { Badge, Button, Card, Modal } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
-import AdminLayout from '../../layout';
+import { useCallback, useEffect, useState } from 'react';
 
-interface DepositRequest {
+interface Transaction {
   id: string;
+  userId: string;
   walletAddress: string;
-  amount: number;
-  memo: string;
-  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
-  createdAt: string;
-}
-
-interface WithdrawRequest {
-  id: string;
-  walletAddress: string;
-  amount: number;
-  bankName: string;
-  accountNumber: string;
-  status: 'PENDING' | 'DONE' | 'REJECTED';
+  fullName: string;
+  type: string;
+  amountVND: number;
+  amountToken?: number;
+  status: string;
+  txHash?: string;
+  refCode?: string;
+  bankInfo?: {
+    bankName?: string;
+    accountNumber?: string;
+    accountName?: string;
+  };
   createdAt: string;
 }
 
 export default function TreasuryPage() {
-  const [selectedDeposit, setSelectedDeposit] = useState<DepositRequest | null>(null);
-  const [selectedWithdraw, setSelectedWithdraw] = useState<WithdrawRequest | null>(null);
+  const [selectedDeposit, setSelectedDeposit] = useState<Transaction | null>(null);
+  const [selectedWithdraw, setSelectedWithdraw] = useState<Transaction | null>(null);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  // Mock data
-  const [depositRequests] = useState<DepositRequest[]>([
-    { id: 'dep1', walletAddress: '0x1234567890abcdef1234567890abcdef12345678', amount: 5000000, memo: '0x123456', status: 'PENDING', createdAt: '2025-12-29T10:30:00' },
-    { id: 'dep2', walletAddress: '0xabcdef1234567890abcdef1234567890abcdef12', amount: 10000000, memo: '0xabcdef', status: 'PENDING', createdAt: '2025-12-29T11:00:00' },
-    { id: 'dep3', walletAddress: '0x9876543210fedcba9876543210fedcba98765432', amount: 2000000, memo: '0x987654', status: 'CONFIRMED', createdAt: '2025-12-28T15:00:00' },
-  ]);
+  const [depositRequests, setDepositRequests] = useState<Transaction[]>([]);
+  const [withdrawRequests, setWithdrawRequests] = useState<Transaction[]>([]);
+  const [treasuryVnd, setTreasuryVnd] = useState<number>(0);
 
-  const [withdrawRequests] = useState<WithdrawRequest[]>([
-    { id: 'with1', walletAddress: '0x1234567890abcdef1234567890abcdef12345678', amount: 3000000, bankName: 'Vietcombank', accountNumber: '1234567890', status: 'PENDING', createdAt: '2025-12-29T09:00:00' },
-    { id: 'with2', walletAddress: '0xabcdef1234567890abcdef1234567890abcdef12', amount: 7500000, bankName: 'Techcombank', accountNumber: '0987654321', status: 'PENDING', createdAt: '2025-12-29T12:00:00' },
-  ]);
+  const fetchData = useCallback(async () => {
+    setIsDataLoading(true);
+    try {
+      // Fetch deposit transactions
+      const depositResponse = await fetch('/api/admin/transactions?type=DEPOSIT');
+      const depositData = await depositResponse.json();
+      if (depositData.success) {
+        setDepositRequests(depositData.data.transactions);
+      }
+
+      // Fetch withdraw transactions
+      const withdrawResponse = await fetch('/api/admin/transactions?type=WITHDRAW');
+      const withdrawData = await withdrawResponse.json();
+      if (withdrawData.success) {
+        setWithdrawRequests(withdrawData.data.transactions);
+      }
+
+      // Fetch overall stats (to compute treasury VND = totalSupply * currentPrice)
+      try {
+        const statsResp = await fetch('/api/admin/stats');
+        const statsData = await statsResp.json();
+        if (statsData.success && statsData.data?.stats) {
+          const totalSupply = statsData.data.stats.totalSupply || 0;
+          console.log('Total Supply:', totalSupply);
+          const currentPrice = statsData.data.stats.currentPrice || 0;
+            console.log('Current Price:', currentPrice);
+          setTreasuryVnd(totalSupply * currentPrice);
+        }
+      } catch {
+        // ignore stats fetch errors
+      }
+    } catch {
+      console.error('Error fetching data');
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const pendingDeposits = depositRequests.filter(d => d.status === 'PENDING');
   const pendingWithdraws = withdrawRequests.filter(w => w.status === 'PENDING');
@@ -51,34 +85,84 @@ export default function TreasuryPage() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
+  // Display value rounded down to nearest 1,000 (last 3 digits -> 000)
+  const displayTreasuryVnd = Number.isFinite(treasuryVnd) ? Math.floor(treasuryVnd / 1000) * 1000 : 0;
+
   const handleConfirmDeposit = async () => {
     if (!selectedDeposit) return;
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      alert('Đã xác nhận nạp tiền thành công!');
-      setIsDepositModalOpen(false);
-      setSelectedDeposit(null);
+    try {
+      const response = await fetch('/api/payment/deposit-vnd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: selectedDeposit.walletAddress,
+          amount: selectedDeposit.amountVND,
+          transactionId: selectedDeposit.id,
+          action: 'confirm',
+        }),
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Đã xác nhận nạp tiền thành công!');
+        setIsDepositModalOpen(false);
+        setSelectedDeposit(null);
+        fetchData();
+      } else {
+        alert(data.message || 'Có lỗi xảy ra');
+      }
+    } catch {
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleConfirmWithdraw = async () => {
     if (!selectedWithdraw) return;
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      alert('Đã xác nhận chuyển tiền thành công!');
-      setIsWithdrawModalOpen(false);
-      setSelectedWithdraw(null);
+    try {
+      const response = await fetch('/api/payment/withdraw-vnd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: selectedWithdraw.walletAddress,
+          transactionId: selectedWithdraw.id,
+          action: 'confirm',
+        }),
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('Đã xác nhận chuyển tiền thành công!');
+        setIsWithdrawModalOpen(false);
+        setSelectedWithdraw(null);
+        fetchData();
+      } else {
+        alert(data.message || 'Có lỗi xảy ra');
+      }
+    } catch {
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
+  if (isDataLoading) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <AdminLayout>
+    <>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
@@ -113,7 +197,7 @@ export default function TreasuryPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Tổng VND trong hệ thống</p>
-              <p className="text-2xl font-bold text-green-600">{formatVND(5000000000)}</p>
+              <p className="text-2xl font-bold text-green-600">{formatVND(displayTreasuryVnd)}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,43 +240,51 @@ export default function TreasuryPage() {
                   <TableHead>ID</TableHead>
                   <TableHead>Wallet</TableHead>
                   <TableHead>Số tiền</TableHead>
-                  <TableHead>Nội dung CK</TableHead>
+                  <TableHead>Ref Code</TableHead>
                   <TableHead>Thời gian</TableHead>
                   <TableHead>Trạng thái</TableHead>
                   <TableHead>Hành động</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {depositRequests.map((dep) => (
-                  <TableRow key={dep.id}>
-                    <TableCell className="font-mono text-sm">{dep.id}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {dep.walletAddress.slice(0, 8)}...{dep.walletAddress.slice(-6)}
-                    </TableCell>
-                    <TableCell className="font-medium text-green-600">{formatVND(dep.amount)}</TableCell>
-                    <TableCell className="font-mono">{dep.memo}</TableCell>
-                    <TableCell>{new Date(dep.createdAt).toLocaleString('vi-VN')}</TableCell>
-                    <TableCell>
-                      <Badge variant={dep.status === 'CONFIRMED' ? 'success' : dep.status === 'PENDING' ? 'warning' : 'danger'}>
-                        {dep.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {dep.status === 'PENDING' && (
-                        <Button
-                          size="sm"
-                          variant="success"
-                          onClick={() => {
-                            setSelectedDeposit(dep);
-                            setIsDepositModalOpen(true);
-                          }}
-                        >
-                          Xác nhận
-                        </Button>
-                      )}
+                {depositRequests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                      Chưa có yêu cầu nạp tiền nào
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  depositRequests.map((dep) => (
+                    <TableRow key={dep.id}>
+                      <TableCell className="font-mono text-sm">{dep.id.slice(0, 8)}...</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {dep.walletAddress.slice(0, 8)}...{dep.walletAddress.slice(-6)}
+                      </TableCell>
+                      <TableCell className="font-medium text-green-600">{formatVND(dep.amountVND)}</TableCell>
+                      <TableCell className="font-mono">{dep.refCode || '-'}</TableCell>
+                      <TableCell>{new Date(dep.createdAt).toLocaleString('vi-VN')}</TableCell>
+                      <TableCell>
+                        <Badge variant={dep.status === 'SUCCESS' ? 'success' : dep.status === 'PENDING' ? 'warning' : 'danger'}>
+                          {dep.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {dep.status === 'PENDING' && (
+                          <Button
+                            size="sm"
+                            variant="success"
+                            onClick={() => {
+                              setSelectedDeposit(dep);
+                              setIsDepositModalOpen(true);
+                            }}
+                          >
+                            Xác nhận
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </Card>
@@ -217,37 +309,45 @@ export default function TreasuryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {withdrawRequests.map((wit) => (
-                  <TableRow key={wit.id}>
-                    <TableCell className="font-mono text-sm">{wit.id}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {wit.walletAddress.slice(0, 8)}...{wit.walletAddress.slice(-6)}
-                    </TableCell>
-                    <TableCell className="font-medium text-red-600">{formatVND(wit.amount)}</TableCell>
-                    <TableCell>{wit.bankName}</TableCell>
-                    <TableCell className="font-mono">{wit.accountNumber}</TableCell>
-                    <TableCell>{new Date(wit.createdAt).toLocaleString('vi-VN')}</TableCell>
-                    <TableCell>
-                      <Badge variant={wit.status === 'DONE' ? 'success' : wit.status === 'PENDING' ? 'warning' : 'danger'}>
-                        {wit.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {wit.status === 'PENDING' && (
-                        <Button
-                          size="sm"
-                          variant="success"
-                          onClick={() => {
-                            setSelectedWithdraw(wit);
-                            setIsWithdrawModalOpen(true);
-                          }}
-                        >
-                          Đã chuyển
-                        </Button>
-                      )}
+                {withdrawRequests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                      Chưa có yêu cầu rút tiền nào
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  withdrawRequests.map((wit) => (
+                    <TableRow key={wit.id}>
+                      <TableCell className="font-mono text-sm">{wit.id.slice(0, 8)}...</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {wit.walletAddress.slice(0, 8)}...{wit.walletAddress.slice(-6)}
+                      </TableCell>
+                      <TableCell className="font-medium text-red-600">{formatVND(wit.amountVND)}</TableCell>
+                      <TableCell>{wit.bankInfo?.bankName || '-'}</TableCell>
+                      <TableCell className="font-mono">{wit.bankInfo?.accountNumber || '-'}</TableCell>
+                      <TableCell>{new Date(wit.createdAt).toLocaleString('vi-VN')}</TableCell>
+                      <TableCell>
+                        <Badge variant={wit.status === 'SUCCESS' ? 'success' : wit.status === 'PENDING' ? 'warning' : 'danger'}>
+                          {wit.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {wit.status === 'PENDING' && (
+                          <Button
+                            size="sm"
+                            variant="success"
+                            onClick={() => {
+                              setSelectedWithdraw(wit);
+                              setIsWithdrawModalOpen(true);
+                            }}
+                          >
+                            Đã chuyển
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </Card>
@@ -267,7 +367,7 @@ export default function TreasuryPage() {
           <div className="space-y-4">
             <div className="bg-green-50 rounded-xl p-4 text-center">
               <p className="text-sm text-gray-600">Số tiền</p>
-              <p className="text-2xl font-bold text-green-600">{formatVND(selectedDeposit.amount)}</p>
+              <p className="text-2xl font-bold text-green-600">{formatVND(selectedDeposit.amountVND)}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -276,8 +376,8 @@ export default function TreasuryPage() {
                 <p className="font-mono">{selectedDeposit.walletAddress.slice(0, 12)}...</p>
               </div>
               <div>
-                <p className="text-gray-500">Nội dung CK</p>
-                <p className="font-mono">{selectedDeposit.memo}</p>
+                <p className="text-gray-500">Mã giao dịch</p>
+                <p className="font-mono">{selectedDeposit.refCode || selectedDeposit.id.slice(0, 8)}</p>
               </div>
             </div>
 
@@ -321,13 +421,16 @@ export default function TreasuryPage() {
           <div className="space-y-4">
             <div className="bg-red-50 rounded-xl p-4 text-center">
               <p className="text-sm text-gray-600">Số tiền cần chuyển</p>
-              <p className="text-2xl font-bold text-red-600">{formatVND(selectedWithdraw.amount)}</p>
+              <p className="text-2xl font-bold text-red-600">{formatVND(selectedWithdraw.amountVND)}</p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-2">Thông tin người nhận:</p>
-              <p className="font-medium">{selectedWithdraw.bankName}</p>
-              <p className="font-mono text-lg">{selectedWithdraw.accountNumber}</p>
+              <p className="font-medium">{selectedWithdraw.bankInfo?.bankName || 'N/A'}</p>
+              <p className="font-mono text-lg">{selectedWithdraw.bankInfo?.accountNumber || 'N/A'}</p>
+              {selectedWithdraw.bankInfo?.accountName && (
+                <p className="text-sm text-gray-500">{selectedWithdraw.bankInfo.accountName}</p>
+              )}
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -356,6 +459,6 @@ export default function TreasuryPage() {
           </div>
         )}
       </Modal>
-    </AdminLayout>
+    </>
   );
 }

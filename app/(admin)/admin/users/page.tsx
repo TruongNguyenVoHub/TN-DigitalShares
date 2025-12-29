@@ -3,8 +3,7 @@
 import { Badge, Button, Card, Input, Modal } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
-import AdminLayout from '../../layout';
+import { useCallback, useEffect, useState } from 'react';
 
 interface User {
   id: string;
@@ -19,6 +18,7 @@ interface KYCRequest {
   id: string;
   userId: string;
   walletAddress: string;
+  fullName?: string;
   idCardNumber: string;
   idCardImageFront: string;
   idCardImageBack: string;
@@ -34,18 +34,37 @@ export default function UsersPage() {
   const [extractedName, setExtractedName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  // Mock data
-  const [users] = useState<User[]>([
-    { id: '1', walletAddress: '0x1234567890abcdef1234567890abcdef12345678', fullName: 'Nguyen Van A', kycStatus: 'VERIFIED', isWhitelisted: true, createdAt: '2025-12-01' },
-    { id: '2', walletAddress: '0xabcdef1234567890abcdef1234567890abcdef12', fullName: 'Tran Thi B', kycStatus: 'PENDING', isWhitelisted: false, createdAt: '2025-12-15' },
-    { id: '3', walletAddress: '0x9876543210fedcba9876543210fedcba98765432', fullName: 'Le Van C', kycStatus: 'REJECTED', isWhitelisted: false, createdAt: '2025-12-20' },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [kycRequests, setKycRequests] = useState<KYCRequest[]>([]);
 
-  const [kycRequests] = useState<KYCRequest[]>([
-    { id: 'kyc1', userId: '2', walletAddress: '0xabcdef1234567890abcdef1234567890abcdef12', idCardNumber: '012345678901', idCardImageFront: 'https://example.com/front.jpg', idCardImageBack: 'https://example.com/back.jpg', selfieImage: 'https://example.com/selfie.jpg', status: 'PENDING', createdAt: '2025-12-15' },
-    { id: 'kyc2', userId: '4', walletAddress: '0x1111222233334444555566667777888899990000', idCardNumber: '098765432109', idCardImageFront: 'https://example.com/front2.jpg', idCardImageBack: 'https://example.com/back2.jpg', selfieImage: 'https://example.com/selfie2.jpg', status: 'PENDING', createdAt: '2025-12-28' },
-  ]);
+  const fetchData = useCallback(async () => {
+    setIsDataLoading(true);
+    try {
+      // Fetch users
+      const usersResponse = await fetch(`/api/admin/users${searchTerm ? `?search=${searchTerm}` : ''}`);
+      const usersData = await usersResponse.json();
+      if (usersData.success) {
+        setUsers(usersData.data.users);
+      }
+
+      // Fetch KYC requests
+      const kycResponse = await fetch('/api/admin/kyc/list?status=PENDING');
+      const kycData = await kycResponse.json();
+      if (kycData.success) {
+        setKycRequests(kycData.data.requests);
+      }
+    } catch {
+      console.error('Error fetching data');
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const pendingKYC = kycRequests.filter(k => k.status === 'PENDING');
 
@@ -71,10 +90,11 @@ export default function UsersPage() {
         setIsModalOpen(false);
         setSelectedKYC(null);
         setExtractedName('');
+        fetchData(); // Refresh data
       } else {
         alert(data.message || 'Có lỗi xảy ra');
       }
-    } catch (error) {
+    } catch {
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
@@ -103,10 +123,11 @@ export default function UsersPage() {
         setIsModalOpen(false);
         setSelectedKYC(null);
         setRejectReason('');
+        fetchData(); // Refresh data
       } else {
         alert(data.message || 'Có lỗi xảy ra');
       }
-    } catch (error) {
+    } catch {
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
@@ -118,8 +139,18 @@ export default function UsersPage() {
     u.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (isDataLoading) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <AdminLayout>
+    <>
       <Tabs defaultValue="pending">
         <TabsList className="mb-6">
           <TabsTrigger value="pending">
@@ -344,6 +375,6 @@ export default function UsersPage() {
           </div>
         )}
       </Modal>
-    </AdminLayout>
+    </>
   );
 }

@@ -155,6 +155,13 @@ export default function KYCPage() {
                 )}
 
                 <Input
+                  label="Số CCCD/CMND"
+                  placeholder="Nhập số CCCD/CMND"
+                  value={idCardNumber}
+                  onChange={(e) => setIdCardNumber(e.target.value)}
+                />
+
+                <Input
                   label="Ảnh CCCD mặt trước *"
                   placeholder="Nhập URL ảnh CCCD mặt trước"
                   value={proofIdFront}
@@ -246,6 +253,13 @@ export default function KYCPage() {
                     {message.text}
                   </div>
                 )}
+
+                <Input
+                  label="Số CCCD/CMND"
+                  placeholder="Nhập số CCCD/CMND"
+                  value={idCardNumber}
+                  onChange={(e) => setIdCardNumber(e.target.value)}
+                />
 
                 <Input
                   label="Ảnh CCCD mặt trước *"

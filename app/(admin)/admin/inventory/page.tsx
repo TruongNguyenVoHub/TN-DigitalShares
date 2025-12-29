@@ -2,8 +2,7 @@
 
 import { Badge, Button, Card, Input, Modal } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useState } from 'react';
-import AdminLayout from '../../layout';
+import { useCallback, useEffect, useState } from 'react';
 
 interface InventoryLog {
   id: string;
@@ -15,11 +14,19 @@ interface InventoryLog {
   createdAt: string;
 }
 
+interface InventoryData {
+  symbol: string;
+  realShares: number;
+  mintedTokens: number;
+  currentPrice: number;
+}
+
 export default function InventoryPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   
   // Form states
   const [importQuantity, setImportQuantity] = useState('');
@@ -28,17 +35,43 @@ export default function InventoryPage() {
   const [exportProofUrl, setExportProofUrl] = useState('');
   const [newPrice, setNewPrice] = useState('');
 
-  // Mock data
-  const currentPrice = 35000;
-  const totalSupply = 100000;
-  const treasuryBalance = 75000;
+  // Data from API
+  const [inventory, setInventory] = useState<InventoryData | null>(null);
+  const [logs, setLogs] = useState<InventoryLog[]>([]);
+  const [currentPrice, setCurrentPrice] = useState(0);
 
-  const [logs] = useState<InventoryLog[]>([
-    { id: 'log1', action: 'IMPORT', quantity: 50000, proofUrl: 'https://example.com/proof1.pdf', txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', adminId: 'admin1', createdAt: '2025-12-01T10:00:00' },
-    { id: 'log2', action: 'IMPORT', quantity: 30000, proofUrl: 'https://example.com/proof2.pdf', txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', adminId: 'admin1', createdAt: '2025-12-15T14:00:00' },
-    { id: 'log3', action: 'EXPORT', quantity: 5000, proofUrl: 'https://example.com/proof3.pdf', txHash: '0xfedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321', adminId: 'admin1', createdAt: '2025-12-20T09:00:00' },
-    { id: 'log4', action: 'IMPORT', quantity: 25000, proofUrl: 'https://example.com/proof4.pdf', txHash: '0x1111222233334444555566667777888899990000aaaabbbbccccddddeeeefffff', adminId: 'admin2', createdAt: '2025-12-28T16:00:00' },
-  ]);
+  const fetchData = useCallback(async () => {
+    setIsDataLoading(true);
+    try {
+      // Fetch inventory data
+      const response = await fetch('/api/admin/inventory?symbol=TNT');
+      const data = await response.json();
+      
+      if (data.success) {
+        setInventory(data.data.inventory);
+        setLogs(data.data.logs);
+        setCurrentPrice(data.data.currentPrice);
+      }
+
+      // Also fetch price from blockchain
+      const priceResponse = await fetch('/api/stock/price');
+      const priceData = await priceResponse.json();
+      if (priceData.success) {
+        setCurrentPrice(Number(priceData.data.price));
+      }
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const totalSupply = inventory?.mintedTokens || 0;
+  const treasuryBalance = inventory?.realShares || 0;
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -73,10 +106,11 @@ export default function InventoryPage() {
         setIsImportModalOpen(false);
         setImportQuantity('');
         setImportProofUrl('');
+        fetchData(); // Refresh data
       } else {
         alert(data.message || 'Có lỗi xảy ra');
       }
-    } catch (error) {
+    } catch {
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
@@ -108,10 +142,11 @@ export default function InventoryPage() {
         setIsExportModalOpen(false);
         setExportQuantity('');
         setExportProofUrl('');
+        fetchData(); // Refresh data
       } else {
         alert(data.message || 'Có lỗi xảy ra');
       }
-    } catch (error) {
+    } catch {
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
@@ -125,17 +160,29 @@ export default function InventoryPage() {
     }
 
     setIsLoading(true);
-    // Simulate API call
+    // TODO: Call blockchain API to set price
+    // For now simulate API call
     setTimeout(() => {
       alert(`Đã cập nhật giá thành công: ${formatVND(parseInt(newPrice))}`);
       setIsPriceModalOpen(false);
       setNewPrice('');
       setIsLoading(false);
+      fetchData();
     }, 1000);
   };
 
+  if (isDataLoading) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <AdminLayout>
+    <>
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
@@ -249,41 +296,51 @@ export default function InventoryPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logs.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell className="font-mono text-sm">{log.id}</TableCell>
-                <TableCell>
-                  <Badge variant={log.action === 'IMPORT' ? 'success' : 'danger'}>
-                    {log.action === 'IMPORT' ? '📥 Nhập' : '📤 Xuất'}
-                  </Badge>
+            {logs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-gray-500 py-8">
+                  Chưa có lịch sử nhập/xuất kho
                 </TableCell>
-                <TableCell className={`font-medium ${log.action === 'IMPORT' ? 'text-green-600' : 'text-red-600'}`}>
-                  {log.action === 'IMPORT' ? '+' : '-'}{formatNumber(log.quantity)} TNT
-                </TableCell>
-                <TableCell>
-                  <a 
-                    href={log.proofUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    📄 Xem file
-                  </a>
-                </TableCell>
-                <TableCell>
-                  <a 
-                    href={`https://sepolia.etherscan.io/tx/${log.txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-blue-600 hover:underline"
-                  >
-                    {log.txHash.slice(0, 10)}...
-                  </a>
-                </TableCell>
-                <TableCell>{log.adminId}</TableCell>
-                <TableCell>{new Date(log.createdAt).toLocaleString('vi-VN')}</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              logs.map((log) => (
+                <TableRow key={log.id}>
+                  <TableCell className="font-mono text-sm">{log.id.slice(0, 8)}...</TableCell>
+                  <TableCell>
+                    <Badge variant={log.action === 'IMPORT' ? 'success' : 'danger'}>
+                      {log.action === 'IMPORT' ? '📥 Nhập' : '📤 Xuất'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className={`font-medium ${log.action === 'IMPORT' ? 'text-green-600' : 'text-red-600'}`}>
+                    {log.action === 'IMPORT' ? '+' : '-'}{formatNumber(log.quantity)} TNT
+                  </TableCell>
+                  <TableCell>
+                    <a 
+                      href={log.proofUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      📄 Xem file
+                    </a>
+                  </TableCell>
+                  <TableCell>
+                    {log.txHash ? (
+                      <a 
+                        href={`https://sepolia.etherscan.io/tx/${log.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-xs text-blue-600 hover:underline"
+                      >
+                        {log.txHash.slice(0, 10)}...
+                      </a>
+                    ) : '-'}
+                  </TableCell>
+                  <TableCell>{log.adminId}</TableCell>
+                  <TableCell>{new Date(log.createdAt).toLocaleString('vi-VN')}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Card>
@@ -477,6 +534,6 @@ export default function InventoryPage() {
           </div>
         </div>
       </Modal>
-    </AdminLayout>
+    </>
   );
 }

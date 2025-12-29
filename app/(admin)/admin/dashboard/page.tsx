@@ -2,8 +2,7 @@
 
 import { Badge, Card } from '@/components/ui';
 import Link from 'next/link';
-import { useState } from 'react';
-import AdminLayout from '../../layout';
+import { useEffect, useState } from 'react';
 
 interface Stats {
   totalUsers: number;
@@ -12,18 +11,62 @@ interface Stats {
   vndLiability: number;
   pendingKyc: number;
   pendingDeposits: number;
+  currentPrice: number;
+}
+
+interface RecentTransaction {
+  id: string;
+  type: string;
+  amountVND: number;
+  amountToken?: number;
+  status: string;
+  createdAt: string;
+  user?: {
+    walletAddress: string;
+    fullName: string;
+  };
 }
 
 export default function AdminDashboardPage() {
-  // Mock data - replace with real API calls
   const [stats, setStats] = useState<Stats>({
-    totalUsers: 156,
-    totalSupply: 100000,
-    treasuryBalance: 75000,
-    vndLiability: 5000000000,
-    pendingKyc: 3,
-    pendingDeposits: 5,
+    totalUsers: 0,
+    totalSupply: 0,
+    treasuryBalance: 0,
+    vndLiability: 0,
+    pendingKyc: 0,
+    pendingDeposits: 0,
+    currentPrice: 0,
   });
+  const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/admin/stats');
+      const data = await response.json();
+      
+      if (data.success) {
+        setStats({
+          totalUsers: data.data.stats.totalUsers,
+          totalSupply: data.data.stats.totalSupply,
+          treasuryBalance: data.data.stats.treasuryBalance,
+          vndLiability: data.data.stats.vndLiability,
+          pendingKyc: data.data.stats.pendingKyc,
+          pendingDeposits: data.data.stats.pendingDeposits,
+          currentPrice: data.data.stats.currentPrice,
+        });
+        setRecentTransactions(data.data.recentTransactions || []);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -33,8 +76,57 @@ export default function AdminDashboardPage() {
     return new Intl.NumberFormat('vi-VN').format(num);
   };
 
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'DEPOSIT': return 'money';
+      case 'WITHDRAW': return 'money';
+      case 'BUY_STOCK': return 'trade';
+      case 'SELL_STOCK': return 'trade';
+      case 'DEPOSIT_TOKEN_ONCHAIN': return 'token';
+      case 'WITHDRAW_TOKEN_ONCHAIN': return 'token';
+      default: return 'user';
+    }
+  };
+
+  const getTransactionTitle = (tx: RecentTransaction) => {
+    const wallet = tx.user?.walletAddress?.slice(0, 6) + '...' + tx.user?.walletAddress?.slice(-4) || 'Unknown';
+    switch (tx.type) {
+      case 'DEPOSIT': return `Nạp tiền ${formatVND(tx.amountVND)} từ ${wallet}`;
+      case 'WITHDRAW': return `Rút tiền ${formatVND(tx.amountVND)} về ${wallet}`;
+      case 'BUY_STOCK': return `Mua ${tx.amountToken} TNT - ${wallet}`;
+      case 'SELL_STOCK': return `Bán ${tx.amountToken} TNT - ${wallet}`;
+      case 'DEPOSIT_TOKEN_ONCHAIN': return `Nạp ${tx.amountToken} Token từ ${wallet}`;
+      case 'WITHDRAW_TOKEN_ONCHAIN': return `Rút ${tx.amountToken} Token về ${wallet}`;
+      default: return `Giao dịch từ ${wallet}`;
+    }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} ngày trước`;
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <AdminLayout>
+    <>
       {/* Alerts */}
       {(stats.pendingKyc > 0 || stats.pendingDeposits > 0) && (
         <div className="mb-6 space-y-3">
@@ -160,26 +252,18 @@ export default function AdminDashboardPage() {
         <Card>
           <h3 className="font-semibold text-gray-900 mb-4">Hoạt động gần đây</h3>
           <div className="space-y-4">
-            <ActivityItem
-              icon="user"
-              title="User 0x1234...5678 đã hoàn thành KYC"
-              time="5 phút trước"
-            />
-            <ActivityItem
-              icon="money"
-              title="Nạp tiền 5,000,000 VND từ 0xabcd...efgh"
-              time="15 phút trước"
-            />
-            <ActivityItem
-              icon="trade"
-              title="Giao dịch mua 100 TNT"
-              time="30 phút trước"
-            />
-            <ActivityItem
-              icon="token"
-              title="Rút 50 Token về ví 0x9876...5432"
-              time="1 giờ trước"
-            />
+            {recentTransactions.length > 0 ? (
+              recentTransactions.slice(0, 5).map((tx) => (
+                <ActivityItem
+                  key={tx.id}
+                  icon={getTransactionIcon(tx.type)}
+                  title={getTransactionTitle(tx)}
+                  time={formatTimeAgo(tx.createdAt)}
+                />
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-4">Chưa có hoạt động nào</p>
+            )}
           </div>
         </Card>
 
@@ -229,7 +313,7 @@ export default function AdminDashboardPage() {
           </div>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

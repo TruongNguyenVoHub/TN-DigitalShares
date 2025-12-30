@@ -24,7 +24,6 @@ interface InventoryData {
 export default function InventoryPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   
@@ -33,31 +32,37 @@ export default function InventoryPage() {
   const [importProofUrl, setImportProofUrl] = useState('');
   const [exportQuantity, setExportQuantity] = useState('');
   const [exportProofUrl, setExportProofUrl] = useState('');
-  const [newPrice, setNewPrice] = useState('');
 
   // Data from API
   const [inventory, setInventory] = useState<InventoryData | null>(null);
   const [logs, setLogs] = useState<InventoryLog[]>([]);
   const [currentPrice, setCurrentPrice] = useState(0);
+  
+  // Blockchain data
+  const [totalSupply, setTotalSupply] = useState(0);
+  const [treasuryBalance, setTreasuryBalance] = useState(0);
+  const [circulatingSupply, setCirculatingSupply] = useState(0);
 
   const fetchData = useCallback(async () => {
     setIsDataLoading(true);
     try {
-      // Fetch inventory data
+      // Fetch inventory logs
       const response = await fetch('/api/admin/inventory?symbol=TNT');
       const data = await response.json();
       
       if (data.success) {
         setInventory(data.data.inventory);
         setLogs(data.data.logs);
-        setCurrentPrice(data.data.currentPrice);
       }
 
-      // Also fetch price from blockchain
-      const priceResponse = await fetch('/api/stock/price');
-      const priceData = await priceResponse.json();
-      if (priceData.success) {
-        setCurrentPrice(Number(priceData.data.price));
+      // Fetch blockchain data (totalSupply, treasuryBalance, price)
+      const blockchainResponse = await fetch('/api/admin/inventory/blockchain');
+      const blockchainData = await blockchainResponse.json();
+      if (blockchainData.success) {
+        setTotalSupply(blockchainData.data.totalSupply);
+        setTreasuryBalance(blockchainData.data.treasuryBalance);
+        setCirculatingSupply(blockchainData.data.circulatingSupply);
+        setCurrentPrice(blockchainData.data.currentPrice);
       }
     } catch (error) {
       console.error('Error fetching inventory:', error);
@@ -69,9 +74,6 @@ export default function InventoryPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const totalSupply = inventory?.mintedTokens || 0;
-  const treasuryBalance = inventory?.realShares || 0;
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -153,24 +155,6 @@ export default function InventoryPage() {
     }
   };
 
-  const handleSetPrice = async () => {
-    if (!newPrice) {
-      alert('Vui lòng nhập giá mới');
-      return;
-    }
-
-    setIsLoading(true);
-    // TODO: Call blockchain API to set price
-    // For now simulate API call
-    setTimeout(() => {
-      alert(`Đã cập nhật giá thành công: ${formatVND(parseInt(newPrice))}`);
-      setIsPriceModalOpen(false);
-      setNewPrice('');
-      setIsLoading(false);
-      fetchData();
-    }, 1000);
-  };
-
   if (isDataLoading) {
     return (
       <>
@@ -194,9 +178,9 @@ export default function InventoryPage() {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Tổng Supply</p>
+              <p className="text-sm text-gray-500">Tổng cung</p>
               <p className="text-2xl font-bold text-gray-900">{formatNumber(totalSupply)}</p>
-              <p className="text-xs text-gray-400">Token đã phát hành</p>
+              <p className="text-xs text-gray-400">Mint - Burn</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,9 +193,9 @@ export default function InventoryPage() {
         <Card>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Treasury Balance</p>
+              <p className="text-sm text-gray-500">Số dư Kho Quỹ</p>
               <p className="text-2xl font-bold text-gray-900">{formatNumber(treasuryBalance)}</p>
-              <p className="text-xs text-gray-400">{((treasuryBalance / totalSupply) * 100).toFixed(1)}% tổng supply</p>
+              <p className="text-xs text-gray-400">{totalSupply > 0 ? ((treasuryBalance / totalSupply) * 100).toFixed(1) : '0.0'}% tổng cung</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +209,7 @@ export default function InventoryPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Đang lưu hành</p>
-              <p className="text-2xl font-bold text-gray-900">{formatNumber(totalSupply - treasuryBalance)}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatNumber(circulatingSupply)}</p>
               <p className="text-xs text-gray-400">Token ngoài treasury</p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -240,7 +224,7 @@ export default function InventoryPage() {
       {/* Action Buttons */}
       <Card className="mb-6">
         <h3 className="font-semibold text-gray-900 mb-4">Tác vụ quản lý kho</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Button
             onClick={() => setIsImportModalOpen(true)}
             size="lg"
@@ -263,18 +247,6 @@ export default function InventoryPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
             </svg>
             XUẤT KHO / HỦY
-          </Button>
-
-          <Button
-            onClick={() => setIsPriceModalOpen(true)}
-            size="lg"
-            variant="primary"
-            fullWidth
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            THIẾT LẬP GIÁ
           </Button>
         </div>
       </Card>
@@ -471,65 +443,6 @@ export default function InventoryPage() {
               fullWidth
             >
               Xác nhận BURN
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Price Modal */}
-      <Modal
-        isOpen={isPriceModalOpen}
-        onClose={() => {
-          setIsPriceModalOpen(false);
-          setNewPrice('');
-        }}
-        title="Thiết lập giá Token"
-      >
-        <div className="space-y-4">
-          <div className="bg-blue-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600">Giá hiện tại trên Blockchain</p>
-            <p className="text-3xl font-bold text-blue-600">{formatVND(currentPrice)}</p>
-          </div>
-
-          <Input
-            label="Giá mới (VND)"
-            type="number"
-            placeholder="VD: 40000"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
-          />
-
-          {newPrice && (
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <p className="text-sm text-gray-600">Giá mới sẽ là</p>
-              <p className="text-2xl font-bold text-gray-900">{formatVND(parseInt(newPrice))}</p>
-              <p className={`text-sm mt-1 ${parseInt(newPrice) > currentPrice ? 'text-green-600' : 'text-red-600'}`}>
-                {parseInt(newPrice) > currentPrice ? '↑' : '↓'} 
-                {Math.abs(((parseInt(newPrice) - currentPrice) / currentPrice) * 100).toFixed(2)}%
-              </p>
-            </div>
-          )}
-
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-            <p className="text-sm text-yellow-800">
-              ⚠️ Thay đổi giá sẽ ảnh hưởng đến tất cả giao dịch mua/bán sau thời điểm này.
-            </p>
-          </div>
-
-          <div className="flex gap-4">
-            <Button
-              onClick={() => setIsPriceModalOpen(false)}
-              variant="outline"
-              fullWidth
-            >
-              Hủy
-            </Button>
-            <Button
-              onClick={handleSetPrice}
-              isLoading={isLoading}
-              fullWidth
-            >
-              Cập nhật giá
             </Button>
           </div>
         </div>

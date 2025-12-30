@@ -12,6 +12,7 @@ interface TokenTransaction {
   status: 'PENDING' | 'SUCCESS' | 'FAILED';
   txHash?: string | null;
   createdAt: string;
+  userDailyTotal?: number;
   user?: {
     walletAddress: string;
     fullName: string;
@@ -178,6 +179,7 @@ export default function TokenGatewayPage() {
               </span>
             )}
           </TabsTrigger>
+          <TabsTrigger value="withdraw-history">Lịch sử rút Token</TabsTrigger>
           <TabsTrigger value="deposits">Lịch sử nạp Token</TabsTrigger>
         </TabsList>
 
@@ -200,13 +202,14 @@ export default function TokenGatewayPage() {
                     <TableHead>ID</TableHead>
                     <TableHead>Wallet Address</TableHead>
                     <TableHead>Số lượng</TableHead>
+                    <TableHead>Tổng rút hôm nay</TableHead>
                     <TableHead>Thời gian</TableHead>
                     <TableHead>Trạng thái</TableHead>
                     <TableHead>Hành động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.withdraws.map((req) => (
+                  {data.withdraws.filter(w => w.status === 'PENDING').map((req) => (
                     <TableRow key={req.id}>
                       <TableCell className="font-mono text-sm">{req.id.slice(0, 8)}...</TableCell>
                       <TableCell className="font-mono text-sm">
@@ -214,6 +217,16 @@ export default function TokenGatewayPage() {
                       </TableCell>
                       <TableCell className="font-medium text-red-600">
                         {formatNumber(req.amountToken || 0)} TNT
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${(req.userDailyTotal || 0) > 200 ? 'text-red-600' : 'text-gray-900'}`}>
+                            {formatNumber(req.userDailyTotal || 0)} TNT
+                          </span>
+                          {(req.userDailyTotal || 0) > 200 && (
+                            <Badge variant="danger" className="text-xs">⚠️ {'>'}200</Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>{new Date(req.createdAt).toLocaleString('vi-VN')}</TableCell>
                       <TableCell>
@@ -256,6 +269,77 @@ export default function TokenGatewayPage() {
           </Card>
         </TabsContent>
 
+        {/* Withdraw History Tab */}
+        <TabsContent value="withdraw-history">
+          <Card>
+            <h3 className="font-semibold text-gray-900 mb-4">Lịch sử rút Token</h3>
+            
+            {data.withdraws.filter(w => w.status !== 'PENDING').length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>Chưa có lịch sử rút Token</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Wallet Address</TableHead>
+                    <TableHead>Số lượng</TableHead>
+                    <TableHead>Tổng rút hôm nay</TableHead>
+                    <TableHead>TxHash</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead>Thời gian</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.withdraws.filter(w => w.status !== 'PENDING').map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-mono text-sm">{log.id.slice(0, 8)}...</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {log.user?.walletAddress ? `${log.user.walletAddress.slice(0, 8)}...${log.user.walletAddress.slice(-6)}` : '-'}
+                      </TableCell>
+                      <TableCell className="font-medium text-red-600">
+                        -{formatNumber(log.amountToken || 0)} TNT
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${(log.userDailyTotal || 0) > 200 ? 'text-red-600' : 'text-gray-900'}`}>
+                            {formatNumber(log.userDailyTotal || 0)} TNT
+                          </span>
+                          {(log.userDailyTotal || 0) > 200 && (
+                            <Badge variant="danger" className="text-xs">⚠️ {'>'}200</Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {log.txHash ? (
+                          <a 
+                            href={`https://sepolia.etherscan.io/tx/${log.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-xs text-blue-600 hover:underline"
+                          >
+                            {log.txHash.slice(0, 10)}...
+                          </a>
+                        ) : '-'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={log.status === 'SUCCESS' ? 'success' : 'danger'}>
+                          {log.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(log.createdAt).toLocaleString('vi-VN')}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </TabsContent>
+
         {/* Deposit Logs Tab */}
         <TabsContent value="deposits">
           <Card>
@@ -275,6 +359,7 @@ export default function TokenGatewayPage() {
                     <TableHead>ID</TableHead>
                     <TableHead>Wallet Address</TableHead>
                     <TableHead>Số lượng</TableHead>
+                    <TableHead>Tổng nạp hôm nay</TableHead>
                     <TableHead>TxHash</TableHead>
                     <TableHead>Trạng thái</TableHead>
                     <TableHead>Thời gian</TableHead>
@@ -289,6 +374,16 @@ export default function TokenGatewayPage() {
                       </TableCell>
                       <TableCell className="font-medium text-green-600">
                         +{formatNumber(log.amountToken || 0)} TNT
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${(log.userDailyTotal || 0) > 200 ? 'text-red-600' : 'text-gray-900'}`}>
+                            {formatNumber(log.userDailyTotal || 0)} TNT
+                          </span>
+                          {(log.userDailyTotal || 0) > 200 && (
+                            <Badge variant="danger" className="text-xs">⚠️ {'>'}200</Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         {log.txHash ? (
@@ -337,6 +432,19 @@ export default function TokenGatewayPage() {
               <p className="text-sm text-gray-600 mb-2">Chuyển đến ví:</p>
               <p className="font-mono text-sm break-all">{selectedWithdraw.user?.walletAddress || 'N/A'}</p>
             </div>
+
+            {(selectedWithdraw.userDailyTotal || 0) > 200 && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
+                <p className="text-sm font-semibold text-red-800 mb-1">
+                  ⚠️ CẢNH BÁO: User vượt hạn mức 200 token/ngày
+                </p>
+                <p className="text-sm text-red-700">
+                  Tổng số token rút hôm nay: <strong>{formatNumber(selectedWithdraw.userDailyTotal || 0)} TNT</strong>
+                  <br />
+                  Cần xác nhận kỹ trước khi duyệt yêu cầu này.
+                </p>
+              </div>
+            )}
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
               <p className="text-sm text-yellow-800">

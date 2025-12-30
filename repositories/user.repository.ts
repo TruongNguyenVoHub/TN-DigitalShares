@@ -10,6 +10,9 @@ export type CreateUserInput = {
   kycStatus?: KycStatus
   isWhitelisted?: boolean
   role?: string
+  bankName?: string | null
+  bankAccount?: string | null
+  bankAccountName?: string | null
 }
 
 export type UpdateUserInput = Partial<Omit<CreateUserInput, 'walletAddress'>>
@@ -28,6 +31,9 @@ export const userRepository = {
         vndBalance: data.vndBalance ?? 0,
         kycStatus: data.kycStatus ?? 'PENDING',
         isWhitelisted: data.isWhitelisted ?? false,
+        bankName: data.bankName ?? null,
+        bankAccount: data.bankAccount ?? null,
+        bankAccountName: data.bankAccountName ?? null,
       },
     })
   },

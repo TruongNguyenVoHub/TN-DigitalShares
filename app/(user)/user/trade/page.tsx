@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import UserLayout from '../../layout';
+// import UserLayout from '../../layout';
 
 interface UserProfile {
   vndBalance: number;
@@ -163,8 +163,8 @@ export default function TradePage() {
   const buyTotal = parseFloat(buyAmount || '0') * price;
   const sellTotal = parseFloat(sellAmount || '0') * price;
 
-  return (
-    <UserLayout>
+  return (  
+    <>
       {/* Price Header */}
       <Card className="mb-4">
         <div className="flex items-center justify-between">
@@ -311,6 +311,6 @@ export default function TradePage() {
           </div>
         )}
       </Card>
-    </UserLayout>
+    </>
   );
 }

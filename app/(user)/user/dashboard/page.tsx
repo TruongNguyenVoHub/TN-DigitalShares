@@ -4,7 +4,6 @@ import { Badge, Card } from '@/components/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import UserLayout from '../../layout';
 
 interface UserProfile {
   walletAddress: string;
@@ -69,16 +68,14 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <UserLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
-        </div>
-      </UserLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+      </div>
     );
   }
 
   return (
-    <UserLayout>
+    <>
       {/* Greeting */}
       <div className="mb-4">
         <h1 className="text-xl font-bold text-gray-900">
@@ -237,7 +234,7 @@ export default function DashboardPage() {
           />
         </div>
       </Card>
-    </UserLayout>
+    </>
   );
 }
 

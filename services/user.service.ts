@@ -3,6 +3,7 @@ import { kycRequestRepository, stockTokenRepository, transactionRepository, Tran
 interface BankInfo {
   bankName: string;
   accountNumber: string;
+    accountName: string;
 }
 
 type ApiResponse<T = undefined> = {
@@ -220,28 +221,26 @@ export class UserService {
             };
         }
 
-        const newBalance = (user.vndBalance || 0) + amount;
-        //insert bang transaction
+        // Create PENDING transaction, admin will approve later
         await transactionRepository.create({
             userId: user.id,
             type: "DEPOSIT",
             amountVND: amount,
-            status: "SUCCESS",
+            status: "PENDING",
         });
-        //update balance
-        await userRepository.updateBalance(user.id, newBalance);
+        
         return {
             success: true,
             status: 200,
-            message: "Deposit successful",
+            message: "Deposit request created, waiting for admin approval",
             data: {
                 walletAddress,
-                newBalance,
+                newBalance: user.vndBalance,
             },
         };
     }
 
-    async withdrawVND(walletAddress: string, amount: number, BankInfo: BankInfo): Promise<WithdrawResponse> {
+    async withdrawVND(walletAddress: string, amount: number, bankInfo: BankInfo): Promise<WithdrawResponse> {
         if(!walletAddress || amount <= 0) {
             return {
                 success: false,
@@ -270,23 +269,28 @@ export class UserService {
             };
         }
 
-        const remainingBalance = (user.vndBalance || 0) - amount;
-        //insert bang transaction
+        // Persist latest bank info for this withdrawal request
+        await userRepository.update(user.id, {
+            bankName: bankInfo.bankName,
+            bankAccount: bankInfo.accountNumber,
+            bankAccountName: bankInfo.accountName,
+        });
+
+        // Create PENDING transaction, admin will approve later
         await transactionRepository.create({
             userId: user.id,
             type: "WITHDRAW",
             amountVND: amount,
-            status: "SUCCESS",
+            status: "PENDING",
         });
-        //update balance
-        await userRepository.updateBalance(user.id, remainingBalance);
+        
         return {
             success: true,
             status: 200,
-            message: "Withdraw successful",
+            message: "Withdraw request created, waiting for admin approval",
             data: {
                 walletAddress,
-                remainingBalance,
+                remainingBalance: user.vndBalance,
             },
         };
     }

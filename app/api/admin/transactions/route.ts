@@ -50,7 +50,13 @@ export async function GET(request: NextRequest) {
           status: tx.status,
           txHash: tx.txHash,
           refCode: tx.refCode,
-          bankInfo: tx.bankInfo,
+          bankInfo: tx.user
+            ? {
+                bankName: tx.user.bankName || undefined,
+                accountNumber: tx.user.bankAccount || undefined,
+                accountName: tx.user.bankAccountName || undefined,
+              }
+            : undefined,
           createdAt: tx.createdAt,
         })),
         stats: {

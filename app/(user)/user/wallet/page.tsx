@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import UserLayout from '../../layout';
 
 interface UserProfile {
   vndBalance: number;
@@ -21,6 +20,7 @@ export default function WalletPage() {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [bankName, setBankName] = useState('');
+  const [accountName, setAccountName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [txHash, setTxHash] = useState('');
   const [tokenWithdrawAmount, setTokenWithdrawAmount] = useState('');
@@ -93,7 +93,7 @@ export default function WalletPage() {
   };
 
   const handleWithdrawVND = async () => {
-    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !bankName || !accountNumber) {
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !bankName || !accountNumber || !accountName) {
       setMessage({ type: 'error', text: 'Vui lòng điền đầy đủ thông tin' });
       return;
     }
@@ -108,7 +108,7 @@ export default function WalletPage() {
         body: JSON.stringify({
           walletAddress: address,
           amount: parseFloat(withdrawAmount),
-          bankInfo: { bankName, accountNumber },
+          bankInfo: { bankName, accountNumber, accountName },
         }),
       });
 
@@ -117,6 +117,7 @@ export default function WalletPage() {
         setMessage({ type: 'success', text: 'Yêu cầu rút tiền đã được gửi!' });
         setWithdrawAmount('');
         setBankName('');
+        setAccountName('');
         setAccountNumber('');
         fetchProfile();
       } else {
@@ -192,7 +193,7 @@ export default function WalletPage() {
   };
 
   return (
-    <UserLayout>
+    <>
       {/* Balance Overview */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4">
@@ -313,6 +314,13 @@ export default function WalletPage() {
                     placeholder="VD: Vietcombank"
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
+                  />
+
+                  <Input
+                    label="Tên chủ tài khoản"
+                    placeholder="Nhập tên chủ tài khoản"
+                    value={accountName}
+                    onChange={(e) => setAccountName(e.target.value)}
                   />
 
                   <Input
@@ -439,6 +447,6 @@ export default function WalletPage() {
           </TabsContent>
         </Tabs>
       </Card>
-    </UserLayout>
+    </>
   );
 }

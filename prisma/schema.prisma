@@ -57,6 +57,10 @@ model User {
   tokenBalance  Float    @default(0) // Số dư Token cổ phiếu trong hệ thống (Off-chain)
   kycStatus     KycStatus @default(PENDING)
   isWhitelisted Boolean  @default(false) // Đã được add vào Smart Contract chưa?
+  bankName      String? // Tên ngân hàng (để rút VND)
+  bankAccount   String? // Số tài khoản ngân hàng (để rút VND)
+  bankAccountName String? // Tên chủ tài khoản ngân hàng (để rút VND)
+
   role          String   @default("USER") // USER hoặc ADMIN
   createdAt     DateTime @default(now())
 

@@ -3,7 +3,6 @@
 import { Badge, Button, Card } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import UserLayout from '../../layout';
 
 interface Transaction {
   id: string;
@@ -83,8 +82,9 @@ export default function HistoryPage() {
   ];
 
   return (
-    <UserLayout>
-      <h1 className="text-xl font-bold text-gray-900 mb-4">Lịch sử giao dịch</h1>
+    <>
+      <div className="space-y-4">
+        <h1 className="text-xl font-bold text-gray-900 mb-4">Lịch sử giao dịch</h1>
 
       {/* Filters */}
       <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
@@ -155,6 +155,7 @@ export default function HistoryPage() {
           </div>
         )}
       </Card>
-    </UserLayout>
+      </div>
+    </>
   );
 }

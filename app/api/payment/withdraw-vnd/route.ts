@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface BankInfo {
   bankName: string;
   accountNumber: string;
+    accountName: string;
 }
 
 interface WithdrawRequest {
@@ -25,9 +26,9 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    if (!bankInfo.bankName || !bankInfo.accountNumber) {
+    if (!bankInfo.bankName || !bankInfo.accountNumber || !bankInfo.accountName) {
         return NextResponse.json(
-            { error: "Bank name and account number are required" },
+            { error: "Bank name, account number and account name are required" },
             { status: 400 }
         );
     }

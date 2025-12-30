@@ -303,6 +303,7 @@ export default function TreasuryPage() {
                   <TableHead>Số tiền</TableHead>
                   <TableHead>Ngân hàng</TableHead>
                   <TableHead>STK</TableHead>
+                  <TableHead>Chủ TK</TableHead>
                   <TableHead>Thời gian</TableHead>
                   <TableHead>Trạng thái</TableHead>
                   <TableHead>Hành động</TableHead>
@@ -311,7 +312,7 @@ export default function TreasuryPage() {
               <TableBody>
                 {withdrawRequests.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={9} className="text-center text-gray-500 py-8">
                       Chưa có yêu cầu rút tiền nào
                     </TableCell>
                   </TableRow>
@@ -325,6 +326,7 @@ export default function TreasuryPage() {
                       <TableCell className="font-medium text-red-600">{formatVND(wit.amountVND)}</TableCell>
                       <TableCell>{wit.bankInfo?.bankName || '-'}</TableCell>
                       <TableCell className="font-mono">{wit.bankInfo?.accountNumber || '-'}</TableCell>
+                      <TableCell>{wit.bankInfo?.accountName || '-'}</TableCell>
                       <TableCell>{new Date(wit.createdAt).toLocaleString('vi-VN')}</TableCell>
                       <TableCell>
                         <Badge variant={wit.status === 'SUCCESS' ? 'success' : wit.status === 'PENDING' ? 'warning' : 'danger'}>

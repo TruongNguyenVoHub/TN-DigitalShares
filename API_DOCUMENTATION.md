@@ -131,7 +131,7 @@ Nạp tiền VND vào tài khoản.
   {
     "success": true,
     "status": 200,
-    "message": "Deposit successful",
+    "message": "Deposit request created, waiting for admin approval",
     "data": {
       "walletAddress": "0x1234567890abcdef...",
       "newBalance": 1000000
@@ -154,6 +154,11 @@ Nạp tiền VND vào tài khoản.
   }
   ```
 
+**Note:** 
+- Transaction được tạo với status `PENDING`
+- Balance chưa được cập nhật ngay
+- Admin cần approve transaction qua API `/api/admin/approve-transaction`
+
 ### 4. Withdraw VND
 Rút tiền VND từ tài khoản về ngân hàng.
 
@@ -172,7 +177,8 @@ Rút tiền VND từ tài khoản về ngân hàng.
     "amount": 500000,
     "bankInfo": {
       "bankName": "Vietcombank",
-      "accountNumber": "1234567890"
+      "accountNumber": "1234567890",
+      "accountName": "Nguyen Van A"
     }
   }
   ```
@@ -181,7 +187,7 @@ Rút tiền VND từ tài khoản về ngân hàng.
   {
     "success": true,
     "status": 200,
-    "message": "Withdraw successful",
+    "message": "Withdraw request created, waiting for admin approval",
     "data": {
       "walletAddress": "0x1234567890abcdef...",
       "remainingBalance": 500000
@@ -210,6 +216,12 @@ Rút tiền VND từ tài khoản về ngân hàng.
     "message": "User not found"
   }
   ```
+
+**Note:** 
+- Transaction được tạo với status `PENDING`
+- Balance chưa được trừ ngay
+- Admin cần approve transaction qua API `/api/admin/approve-transaction`
+- Bank info được lưu vào user record để admin xử lý chuyển khoản
 
 ---
 
@@ -747,7 +759,87 @@ Phê duyệt hoặc từ chối yêu cầu KYC của user.
   - User status sẽ chuyển thành `REJECTED`
   - Cần cung cấp `reason` để user biết lý do
 
-### 13. Import Stock Inventory (Admin Only)
+### 13. Approve Transaction (Admin Only)
+Admin phê duyệt hoặc từ chối yêu cầu nạp/rút tiền VND.
+
+- **Method:** `POST`
+- **Endpoint:** `/api/admin/approve-transaction`
+- **Headers:**
+  ```json
+  {
+    "Content-Type": "application/json"
+  }
+  ```
+- **Request Body:**
+  ```json
+  {
+    "transactionId": "cm123abc...",
+    "action": "approve"
+  }
+  ```
+  *Note: `action` phải là `"approve"` hoặc `"reject"`*
+- **Response (Approve):**
+  ```json
+  {
+    "success": true,
+    "status": 200,
+    "message": "Transaction approved successfully",
+    "data": {
+      "transactionId": "cm123abc...",
+      "status": "SUCCESS"
+    }
+  }
+  ```
+- **Response (Reject):**
+  ```json
+  {
+    "success": true,
+    "status": 200,
+    "message": "Transaction rejected",
+    "data": {
+      "transactionId": "cm123abc...",
+      "status": "FAILED"
+    }
+  }
+  ```
+- **Error Response:**
+  ```json
+  {
+    "success": false,
+    "status": 400,
+    "message": "Missing transactionId or action"
+  }
+  ```
+  ```json
+  {
+    "success": false,
+    "status": 404,
+    "message": "Transaction not found"
+  }
+  ```
+  ```json
+  {
+    "success": false,
+    "status": 400,
+    "message": "Transaction is not pending"
+  }
+  ```
+  ```json
+  {
+    "success": false,
+    "status": 400,
+    "message": "Insufficient balance"
+  }
+  ```
+
+**Note:**
+- Chỉ approve/reject được transaction có status `PENDING`
+- Khi approve DEPOSIT: Cập nhật status → SUCCESS và cộng tiền vào balance user
+- Khi approve WITHDRAW: Kiểm tra balance lần nữa, nếu đủ thì trừ tiền và cập nhật status → SUCCESS
+- Khi reject: Cập nhật status → FAILED, không thay đổi balance
+- Admin cần xử lý chuyển khoản ngân hàng ngoài hệ thống (đối với withdraw)
+
+### 14. Import Stock Inventory (Admin Only)
 Admin nhập kho cổ phiếu thật và mint token tương ứng trên blockchain.
 
 - **Method:** `POST`

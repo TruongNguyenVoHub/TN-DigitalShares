@@ -34,6 +34,7 @@ export default function TreasuryPage() {
 
   const [depositRequests, setDepositRequests] = useState<Transaction[]>([]);
   const [withdrawRequests, setWithdrawRequests] = useState<Transaction[]>([]);
+  const [tradingTransactions, setTradingTransactions] = useState<Transaction[]>([]);
   const [treasuryVnd, setTreasuryVnd] = useState<number>(0);
 
   const fetchData = useCallback(async () => {
@@ -51,6 +52,16 @@ export default function TreasuryPage() {
       const withdrawData = await withdrawResponse.json();
       if (withdrawData.success) {
         setWithdrawRequests(withdrawData.data.transactions);
+      }
+
+      // Fetch trading transactions (BUY_STOCK and SELL_STOCK)
+      const tradingResponse = await fetch('/api/admin/transactions');
+      const tradingData = await tradingResponse.json();
+      if (tradingData.success) {
+        const trades = tradingData.data.transactions.filter(
+          (tx: Transaction) => tx.type === 'BUY_STOCK' || tx.type === 'SELL_STOCK'
+        );
+        setTradingTransactions(trades);
       }
 
       // Fetch overall stats (to compute treasury VND = totalSupply * currentPrice)
@@ -93,14 +104,12 @@ export default function TreasuryPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/payment/deposit-vnd', {
+      const response = await fetch('/api/admin/approve-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: selectedDeposit.walletAddress,
-          amount: selectedDeposit.amountVND,
           transactionId: selectedDeposit.id,
-          action: 'confirm',
+          action: 'approve',
         }),
       });
       
@@ -125,13 +134,12 @@ export default function TreasuryPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/payment/withdraw-vnd', {
+      const response = await fetch('/api/admin/approve-transaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: selectedWithdraw.walletAddress,
           transactionId: selectedWithdraw.id,
-          action: 'confirm',
+          action: 'approve',
         }),
       });
       
@@ -224,6 +232,14 @@ export default function TreasuryPage() {
             {pendingWithdraws.length > 0 && (
               <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                 {pendingWithdraws.length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="trading">
+            Giao dịch Token
+            {tradingTransactions.length > 0 && (
+              <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                {tradingTransactions.length}
               </span>
             )}
           </TabsTrigger>
@@ -346,6 +362,69 @@ export default function TreasuryPage() {
                             Đã chuyển
                           </Button>
                         )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+
+        {/* Trading Tab */}
+        <TabsContent value="trading">
+          <Card>
+            <h3 className="font-semibold text-gray-900 mb-4">Giao dịch mua/bán Token</h3>
+            
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Loại</TableHead>
+                  <TableHead>Số Token</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Tổng VND</TableHead>
+                  <TableHead>Thời gian</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tradingTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                      Chưa có giao dịch nào
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  tradingTransactions.map((trade) => (
+                    <TableRow key={trade.id}>
+                      <TableCell className="font-mono text-sm">{trade.id.slice(0, 8)}...</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-sm">{trade.fullName || 'N/A'}</p>
+                          <p className="text-xs text-gray-500 font-mono">
+                            {trade.walletAddress.slice(0, 8)}...{trade.walletAddress.slice(-6)}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={trade.type === 'BUY_STOCK' ? 'info' : 'warning'}>
+                          {trade.type === 'BUY_STOCK' ? 'MUA' : 'BÁN'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">{trade.amountToken || 0} TNT</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {trade.amountToken && trade.amountVND 
+                          ? formatVND(trade.amountVND / trade.amountToken)
+                          : '-'}
+                      </TableCell>
+                      <TableCell className="font-medium text-blue-600">{formatVND(trade.amountVND)}</TableCell>
+                      <TableCell className="text-sm">{new Date(trade.createdAt).toLocaleString('vi-VN')}</TableCell>
+                      <TableCell>
+                        <Badge variant={trade.status === 'SUCCESS' ? 'success' : trade.status === 'PENDING' ? 'warning' : 'danger'}>
+                          {trade.status}
+                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))

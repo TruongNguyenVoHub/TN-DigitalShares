@@ -2,7 +2,7 @@
 
 import { Badge, Card } from '@/components/ui';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Stats {
   totalUsers: number;
@@ -40,11 +40,7 @@ export default function AdminDashboardPage() {
   const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/stats');
       const data = await response.json();
@@ -66,7 +62,11 @@ export default function AdminDashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);

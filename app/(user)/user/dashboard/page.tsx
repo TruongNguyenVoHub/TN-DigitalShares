@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, Card } from '@/components/ui';
+import { getWalletAddress } from '@/utils/wallet.util';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -26,15 +27,19 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (address) {
-      fetchProfile();
+    const walletAddress = getWalletAddress(address);
+    
+    if (walletAddress) {
+      fetchProfile(walletAddress);
       fetchPrice();
+    } else {
+      setIsLoading(false);
     }
   }, [address]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (wallet: string) => {
     try {
-      const response = await fetch(`/api/user/${address}/profile`);
+      const response = await fetch(`/api/user/${wallet}/profile`);
       const data = await response.json();
       if (data.success) {
         setProfile(data.data);

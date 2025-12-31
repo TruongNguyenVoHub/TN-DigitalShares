@@ -2,6 +2,7 @@
 
 import { Badge, Button, Card, Input } from '@/components/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getWalletAddress } from '@/utils/wallet.util';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -37,18 +38,21 @@ export default function TradePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [recentOrders, setRecentOrders] = useState<Transaction[]>([]);
+  const [walletAddress, setWalletAddress] = useState<string>('');
 
   useEffect(() => {
-    if (address) {
-      fetchProfile();
+    const wallet = getWalletAddress(address);
+    if (wallet) {
+      setWalletAddress(wallet);
+      fetchProfile(wallet);
       fetchPrice();
-      fetchTransactions();
+      fetchTransactions(wallet);
     }
   }, [address]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (wallet: string) => {
     try {
-      const response = await fetch(`/api/user/${address}/profile`);
+      const response = await fetch(`/api/user/${wallet}/profile`);
       const data = await response.json();
       if (data.success) {
         setProfile(data.data);
@@ -70,9 +74,9 @@ export default function TradePage() {
     }
   };
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (wallet: string) => {
     try {
-      const response = await fetch(`/api/user/${address}/transaction`);
+      const response = await fetch(`/api/user/${wallet}/transaction`);
       const data = await response.json();
       if (data.success) {
         const orders = data.data.transactions
@@ -99,7 +103,7 @@ export default function TradePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address,
+          walletAddress: walletAddress,
           amountToken: parseFloat(buyAmount),
         }),
       });
@@ -108,8 +112,8 @@ export default function TradePage() {
       if (data.success) {
         setMessage({ type: 'success', text: 'Mua thành công!' });
         setBuyAmount('');
-        fetchProfile();
-        fetchTransactions();
+        fetchProfile(walletAddress);
+        fetchTransactions(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }
@@ -134,7 +138,7 @@ export default function TradePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address,
+          walletAddress: walletAddress,
           amountToken: parseFloat(sellAmount),
         }),
       });
@@ -143,8 +147,8 @@ export default function TradePage() {
       if (data.success) {
         setMessage({ type: 'success', text: 'Bán thành công!' });
         setSellAmount('');
-        fetchProfile();
-        fetchTransactions();
+        fetchProfile(walletAddress);
+        fetchTransactions(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Card, Input, Modal } from '@/components/ui';
+import { Badge, Button, Card, Input, Modal, ToastContainer, useToast } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -22,6 +22,7 @@ interface InventoryData {
 }
 
 export default function InventoryPage() {
+  const { toasts, removeToast, success, error } = useToast();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +86,7 @@ export default function InventoryPage() {
 
   const handleImport = async () => {
     if (!importQuantity || !importProofUrl) {
-      alert('Vui lòng điền đầy đủ thông tin');
+      error('Vui lòng điền đầy đủ thông tin');
       return;
     }
 
@@ -104,16 +105,16 @@ export default function InventoryPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`Nhập kho thành công! TxHash: ${data.data.txHash}`);
+        success(`Nhập kho thành công! TxHash: ${data.data.txHash}`);
         setIsImportModalOpen(false);
         setImportQuantity('');
         setImportProofUrl('');
         fetchData(); // Refresh data
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +122,7 @@ export default function InventoryPage() {
 
   const handleExport = async () => {
     if (!exportQuantity || !exportProofUrl) {
-      alert('Vui lòng điền đầy đủ thông tin');
+      error('Vui lòng điền đầy đủ thông tin');
       return;
     }
 
@@ -140,16 +141,16 @@ export default function InventoryPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`Xuất kho thành công! TxHash: ${data.data.txHash}`);
+        success(`Xuất kho thành công! TxHash: ${data.data.txHash}`);
         setIsExportModalOpen(false);
         setExportQuantity('');
         setExportProofUrl('');
         fetchData(); // Refresh data
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -447,6 +448,7 @@ export default function InventoryPage() {
           </div>
         </div>
       </Modal>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 }

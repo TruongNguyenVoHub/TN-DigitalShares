@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Card, Modal } from '@/components/ui';
+import { Badge, Button, Card, Modal, ToastContainer, useToast } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,6 +25,7 @@ interface Transaction {
 }
 
 export default function TreasuryPage() {
+  const { toasts, removeToast, success, error } = useToast();
   const [selectedDeposit, setSelectedDeposit] = useState<Transaction | null>(null);
   const [selectedWithdraw, setSelectedWithdraw] = useState<Transaction | null>(null);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -115,15 +116,15 @@ export default function TreasuryPage() {
       
       const data = await response.json();
       if (data.success) {
-        alert('Đã xác nhận nạp tiền thành công!');
+        success('Đã xác nhận nạp tiền thành công!');
         setIsDepositModalOpen(false);
         setSelectedDeposit(null);
         fetchData();
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -145,15 +146,15 @@ export default function TreasuryPage() {
       
       const data = await response.json();
       if (data.success) {
-        alert('Đã xác nhận chuyển tiền thành công!');
+        success('Đã xác nhận chuyển tiền thành công!');
         setIsWithdrawModalOpen(false);
         setSelectedWithdraw(null);
         fetchData();
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -256,7 +257,7 @@ export default function TreasuryPage() {
                   <TableHead>ID</TableHead>
                   <TableHead>Wallet</TableHead>
                   <TableHead>Số tiền</TableHead>
-                  <TableHead>Ref Code</TableHead>
+                  {/* <TableHead>Ref Code</TableHead> */}
                   <TableHead>Thời gian</TableHead>
                   <TableHead>Trạng thái</TableHead>
                   <TableHead>Hành động</TableHead>
@@ -277,7 +278,7 @@ export default function TreasuryPage() {
                         {dep.walletAddress.slice(0, 8)}...{dep.walletAddress.slice(-6)}
                       </TableCell>
                       <TableCell className="font-medium text-green-600">{formatVND(dep.amountVND)}</TableCell>
-                      <TableCell className="font-mono">{dep.refCode || '-'}</TableCell>
+                      {/* <TableCell className="font-mono">{dep.refCode || '-'}</TableCell> */}
                       <TableCell>{new Date(dep.createdAt).toLocaleString('vi-VN')}</TableCell>
                       <TableCell>
                         <Badge variant={dep.status === 'SUCCESS' ? 'success' : dep.status === 'PENDING' ? 'warning' : 'danger'}>
@@ -540,6 +541,8 @@ export default function TreasuryPage() {
           </div>
         )}
       </Modal>
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 }

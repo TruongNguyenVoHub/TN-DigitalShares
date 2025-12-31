@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Card, Input } from '@/components/ui';
+import { Badge, Button, Card, Input, ToastContainer, useToast } from '@/components/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -8,11 +8,13 @@ import { useAccount } from 'wagmi';
 export default function KYCPage() {
   const { address } = useAccount();
   const router = useRouter();
+  const { toasts, showToast, removeToast, success, error } = useToast();
   
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [kycStatus, setKycStatus] = useState<string>('PENDING');
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [kycStatus, setKycStatus] = useState<string>('');
+  const [userWalletAddress, setUserWalletAddress] = useState<string>('');
+
   
   // Form data
   const [fullName, setFullName] = useState('');
@@ -27,6 +29,7 @@ export default function KYCPage() {
     if (userData) {
       const user = JSON.parse(userData);
       setKycStatus(user.kycStatus);
+      setUserWalletAddress(user.walletAddress);
       if (user.kycStatus === 'VERIFIED') {
         router.push('/user/dashboard');
       }
@@ -35,35 +38,58 @@ export default function KYCPage() {
 
   const handleSubmitKYC = async () => {
     if (!fullName || !idCardNumber || !idCardFront || !idCardBack || !selfieImage) {
-      setMessage({ type: 'error', text: 'Vui lòng điền đầy đủ thông tin' });
+      error('Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+
+    // Use walletAddress from localStorage (for username/password login) or from wagmi (for MetaMask)
+    const walletAddress = userWalletAddress || address;
+    
+    if (!walletAddress) {
+      error('Vui lòng kết nối ví hoặc đăng nhập lại');
       return;
     }
 
     setIsLoading(true);
-    setMessage({ type: '', text: '' });
 
     try {
+      const payload = {
+        walletAddress,
+        idCardNumber,
+        idCardImageFront: idCardFront,
+        idCardImageBack: idCardBack,
+        selfieImage,
+      };
+      
+      console.log('Submitting KYC with payload:', payload);
+
       const response = await fetch('/api/user/kyc/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: address,
-          idCardNumber,
-          idCardImageFront: idCardFront,
-          idCardImageBack: idCardBack,
-          selfieImage,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
+      console.log('KYC response:', data);
+      
       if (data.success) {
+        success('Gửi yêu cầu KYC thành công!');
         setKycStatus('PENDING');
         setStep(4); // Go to waiting screen
+        
+        // Update localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          user.kycStatus = 'PENDING';
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       } else {
-        setMessage({ type: 'error', text: data.error || 'Có lỗi xảy ra' });
+        error(data.error || 'Có lỗi xảy ra');
       }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra. Vui lòng thử lại.' });
+    } catch (err) {
+      console.error('KYC submission error:', err);
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -78,19 +104,26 @@ export default function KYCPage() {
 
   const handleUploadProof = async () => {
     if (!proofIdFront || !proofIdBack || !proofSelfie) {
-      setMessage({ type: 'error', text: 'Vui lòng điền đầy đủ ảnh CCCD và selfie' });
+      error('Vui lòng điền đầy đủ ảnh CCCD và selfie');
+      return;
+    }
+
+    // Use walletAddress from localStorage (for username/password login) or from wagmi (for MetaMask)
+    const walletAddress = userWalletAddress || address;
+    
+    if (!walletAddress) {
+      error('Vui lòng kết nối ví hoặc đăng nhập lại');
       return;
     }
 
     setIsLoading(true);
-    setMessage({ type: '', text: '' });
 
     try {
       const response = await fetch('/api/user/kyc/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address,
+          walletAddress,
           idCardNumber: idCardNumber || 'N/A',
           idCardImageFront: proofIdFront,
           idCardImageBack: proofIdBack,
@@ -100,17 +133,17 @@ export default function KYCPage() {
 
       const data = await response.json();
       if (data.success) {
-        setMessage({ type: 'success', text: 'Tải lên thành công! Vui lòng chờ duyệt.' });
+        success('Tải lên thành công! Vui lòng chờ duyệt.');
         setShowUploadProof(false);
         setProofIdFront('');
         setProofIdBack('');
         setProofSelfie('');
         setProofAdditional('');
       } else {
-        setMessage({ type: 'error', text: data.error || 'Có lỗi xảy ra' });
+        error(data.error || 'Có lỗi xảy ra');
       }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra. Vui lòng thử lại.' });
+    } catch (err) {
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -146,14 +179,6 @@ export default function KYCPage() {
               </Button>
             ) : (
               <div className="space-y-4">
-                {message.text && (
-                  <div className={`p-3 rounded-lg text-sm ${
-                    message.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
                 <Input
                   label="Số CCCD/CMND"
                   placeholder="Nhập số CCCD/CMND"
@@ -246,14 +271,6 @@ export default function KYCPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {message.text && (
-                  <div className={`p-3 rounded-lg text-sm ${
-                    message.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
                 <Input
                   label="Số CCCD/CMND"
                   placeholder="Nhập số CCCD/CMND"
@@ -460,14 +477,6 @@ export default function KYCPage() {
                 )}
               </div>
 
-              {message.text && (
-                <div className={`p-3 rounded-xl text-sm ${
-                  message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                }`}>
-                  {message.text}
-                </div>
-              )}
-
               <div className="flex gap-3">
                 <Button onClick={() => setStep(2)} variant="outline" fullWidth>
                   Quay lại
@@ -486,6 +495,7 @@ export default function KYCPage() {
           )}
         </Card>
       </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

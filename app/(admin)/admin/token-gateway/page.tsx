@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Card, Modal } from '@/components/ui';
+import { Badge, Button, Card, Modal, ToastContainer, useToast } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCallback, useEffect, useState } from 'react';
@@ -34,6 +34,7 @@ interface GatewayData {
 }
 
 export default function TokenGatewayPage() {
+  const { toasts, removeToast, success, error } = useToast();
   const [selectedWithdraw, setSelectedWithdraw] = useState<TokenTransaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,15 +91,15 @@ export default function TokenGatewayPage() {
       const result = await response.json();
       
       if (result.success) {
-        alert(`Đã chuyển ${selectedWithdraw.amountToken} TNT!`);
+        success(`Đã chuyển ${selectedWithdraw.amountToken} TNT!`);
         setIsModalOpen(false);
         setSelectedWithdraw(null);
         fetchData(); // Refresh data
       } else {
-        alert(`Lỗi: ${result.message}`);
+        error(`Lỗi: ${result.message}`);
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -478,6 +479,7 @@ export default function TokenGatewayPage() {
           </div>
         )}
       </Modal>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, Button, Card } from '@/components/ui';
+import { getWalletAddress } from '@/utils/wallet.util';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -22,14 +23,15 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
-    if (address) {
-      fetchTransactions();
+    const walletAddress = getWalletAddress(address);
+    if (walletAddress) {
+      fetchTransactions(walletAddress);
     }
   }, [address]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (wallet: string) => {
     try {
-      const response = await fetch(`/api/user/${address}/transaction`);
+      const response = await fetch(`/api/user/${wallet}/transaction`);
       const data = await response.json();
       if (data.success) {
         setTransactions(data.data.transactions);

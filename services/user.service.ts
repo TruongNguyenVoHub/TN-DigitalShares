@@ -51,12 +51,14 @@ type TradeTokenData = {
 
 type UserProfileData ={
     walletAddress: string;
+    username?: string;
     fullName: string;
     vndBalance: number;
     tokenBalance: number;
     kycStatus: string;
     isWhitelisted: boolean;
     role: string;
+    walletType: string;
 }
 type UserTransactionData = {
     transactions: Array<{
@@ -147,12 +149,14 @@ export class UserService {
             message: "User profile retrieved successfully",
             data: {
                 walletAddress: user.walletAddress,
+                username: user.username || undefined,
                 fullName: user.fullName,
                 vndBalance: user.vndBalance || 0,
                 tokenBalance: user.tokenBalance || 0,
                 kycStatus: user.kycStatus,
                 isWhitelisted: user.isWhitelisted,
                 role: user.role,
+                walletType: user.walletType || 'EXTERNAL',
             },
         };
     }

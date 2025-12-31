@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Card, Input, Modal } from '@/components/ui';
+import { Badge, Button, Card, Input, Modal, ToastContainer, useToast } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,6 +28,7 @@ interface KYCRequest {
 }
 
 export default function UsersPage() {
+  const { toasts, removeToast, success, error } = useToast();
   const [selectedKYC, setSelectedKYC] = useState<KYCRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
@@ -86,16 +87,16 @@ export default function UsersPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert('KYC đã được duyệt thành công!');
+        success('KYC đã được duyệt thành công!');
         setIsModalOpen(false);
         setSelectedKYC(null);
         setExtractedName('');
         fetchData(); // Refresh data
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -119,16 +120,16 @@ export default function UsersPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert('KYC đã bị từ chối!');
+        success('KYC đã bị từ chối!');
         setIsModalOpen(false);
         setSelectedKYC(null);
         setRejectReason('');
         fetchData(); // Refresh data
       } else {
-        alert(data.message || 'Có lỗi xảy ra');
+        error(data.message || 'Có lỗi xảy ra');
       }
     } catch {
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -306,16 +307,38 @@ export default function UsersPage() {
             <div>
               <p className="text-sm text-gray-500 mb-2">Ảnh CCCD</p>
               <div className="grid grid-cols-2 gap-4">
-                <div className="border rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-2">Mặt trước</p>
-                  <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400">Ảnh CCCD mặt trước</span>
+                <div className="border rounded-xl p-4">
+                  <p className="text-xs text-gray-400 mb-2 text-center">Mặt trước</p>
+                  {selectedKYC.idCardImageFront ? (
+                    <img 
+                      src={selectedKYC.idCardImageFront} 
+                      alt="CCCD mặt trước" 
+                      className="w-full h-auto rounded-lg object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).nextElementSibling!.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`aspect-video bg-gray-100 rounded-lg flex items-center justify-center ${selectedKYC.idCardImageFront ? 'hidden' : ''}`}>
+                    <span className="text-gray-400 text-sm">Không có ảnh</span>
                   </div>
                 </div>
-                <div className="border rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-2">Mặt sau</p>
-                  <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400">Ảnh CCCD mặt sau</span>
+                <div className="border rounded-xl p-4">
+                  <p className="text-xs text-gray-400 mb-2 text-center">Mặt sau</p>
+                  {selectedKYC.idCardImageBack ? (
+                    <img 
+                      src={selectedKYC.idCardImageBack} 
+                      alt="CCCD mặt sau" 
+                      className="w-full h-auto rounded-lg object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).nextElementSibling!.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className={`aspect-video bg-gray-100 rounded-lg flex items-center justify-center ${selectedKYC.idCardImageBack ? 'hidden' : ''}`}>
+                    <span className="text-gray-400 text-sm">Không có ảnh</span>
                   </div>
                 </div>
               </div>
@@ -324,9 +347,20 @@ export default function UsersPage() {
             {/* Selfie */}
             <div>
               <p className="text-sm text-gray-500 mb-2">Ảnh Selfie</p>
-              <div className="border rounded-xl p-4 text-center max-w-xs mx-auto">
-                <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400">Ảnh selfie</span>
+              <div className="border rounded-xl p-4 max-w-xs mx-auto">
+                {selectedKYC.selfieImage ? (
+                  <img 
+                    src={selectedKYC.selfieImage} 
+                    alt="Selfie" 
+                    className="w-full h-auto rounded-lg object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling!.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <div className={`aspect-square bg-gray-100 rounded-lg flex items-center justify-center ${selectedKYC.selfieImage ? 'hidden' : ''}`}>
+                  <span className="text-gray-400 text-sm">Không có ảnh</span>
                 </div>
               </div>
             </div>
@@ -375,6 +409,8 @@ export default function UsersPage() {
           </div>
         )}
       </Modal>
+      
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 }

@@ -5,4 +5,5 @@ export * from './input';
 export * from './modal';
 export * from './table';
 export * from './tabs';
+export * from './toast';
 

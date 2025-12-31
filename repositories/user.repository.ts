@@ -5,7 +5,11 @@ import { prisma } from '@/lib/prisma'
 
 export type CreateUserInput = {
   walletAddress: string
-  fullName: string
+  fullName?: string
+  username?: string
+  passwordHash?: string
+  privateKeyEnc?: string
+  walletType?: string
   vndBalance?: number
   kycStatus?: KycStatus
   isWhitelisted?: boolean
@@ -15,7 +19,7 @@ export type CreateUserInput = {
   bankAccountName?: string | null
 }
 
-export type UpdateUserInput = Partial<Omit<CreateUserInput, 'walletAddress'>>
+export type UpdateUserInput = Partial<CreateUserInput>
 
 // ==================== Repository ====================
 
@@ -26,14 +30,19 @@ export const userRepository = {
   async create(data: CreateUserInput): Promise<User> {
     return prisma.user.create({
       data: {
+        username: data.username ? data.username.toLowerCase() : null,
+        passwordHash: data.passwordHash || null,
+        privateKeyEnc: data.privateKeyEnc || null,
+        walletType: data.walletType || 'EXTERNAL',
         walletAddress: data.walletAddress.toLowerCase(),
-        fullName: data.fullName,
+        fullName: data.fullName || null,
         vndBalance: data.vndBalance ?? 0,
         kycStatus: data.kycStatus ?? 'PENDING',
         isWhitelisted: data.isWhitelisted ?? false,
         bankName: data.bankName ?? null,
         bankAccount: data.bankAccount ?? null,
         bankAccountName: data.bankAccountName ?? null,
+        role: data.role ?? 'USER',
       },
     })
   },
@@ -186,5 +195,42 @@ export const userRepository = {
       where: { walletAddress: walletAddress.toLowerCase() },
     })
     return count > 0
+  },
+
+  /**
+   * Tìm user theo username
+   */
+  async findByUsername(username: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { username: username.toLowerCase() },
+    })
+  },
+
+  /**
+   * Kiểm tra username đã tồn tại chưa
+   */
+  async existsByUsername(username: string): Promise<boolean> {
+    const count = await prisma.user.count({
+      where: { username: username.toLowerCase() },
+    })
+    return count > 0
+  },
+
+  /**
+   * Tìm user theo username kèm password (để login)
+   */
+  async findByUsernameWithPassword(username: string) {
+    return prisma.user.findUnique({
+      where: { username: username.toLowerCase() },
+      select: {
+        id: true,
+        username: true,
+        passwordHash: true,
+        walletAddress: true,
+        kycStatus: true,
+        isWhitelisted: true,
+        role: true,
+      },
+    })
   },
 }

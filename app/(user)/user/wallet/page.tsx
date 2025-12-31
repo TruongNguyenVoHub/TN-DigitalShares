@@ -2,6 +2,7 @@
 
 import { Button, Card, Input } from '@/components/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getWalletAddress } from '@/utils/wallet.util';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -27,6 +28,7 @@ export default function WalletPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [depositConfirmed, setDepositConfirmed] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string>('');
 
   const COMPANY_WALLET = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || '0x...';
   const COMPANY_BANK = {
@@ -36,14 +38,16 @@ export default function WalletPage() {
   };
 
   useEffect(() => {
-    if (address) {
-      fetchProfile();
+    const wallet = getWalletAddress(address);
+    if (wallet) {
+      setWalletAddress(wallet);
+      fetchProfile(wallet);
     }
   }, [address]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (wallet: string) => {
     try {
-      const response = await fetch(`/api/user/${address}/profile`);
+      const response = await fetch(`/api/user/${wallet}/profile`);
       const data = await response.json();
       if (data.success) {
         setProfile(data.data);
@@ -71,7 +75,7 @@ export default function WalletPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address,
+          walletAddress: walletAddress,
           amount: parseFloat(depositAmount),
         }),
       });
@@ -81,7 +85,7 @@ export default function WalletPage() {
         setMessage({ type: 'success', text: 'Nạp tiền thành công!' });
         setDepositAmount('');
         setDepositConfirmed(false);
-        fetchProfile();
+        fetchProfile(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }
@@ -106,7 +110,7 @@ export default function WalletPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address,
+          walletAddress: walletAddress,
           amount: parseFloat(withdrawAmount),
           bankInfo: { bankName, accountNumber, accountName },
         }),
@@ -119,7 +123,7 @@ export default function WalletPage() {
         setBankName('');
         setAccountName('');
         setAccountNumber('');
-        fetchProfile();
+        fetchProfile(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }
@@ -140,7 +144,7 @@ export default function WalletPage() {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await fetch(`/api/user/${address}/deposit-token`, {
+      const response = await fetch(`/api/user/${walletAddress}/deposit-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ txHash }),
@@ -150,7 +154,7 @@ export default function WalletPage() {
       if (data.success) {
         setMessage({ type: 'success', text: 'Nạp Token thành công!' });
         setTxHash('');
-        fetchProfile();
+        fetchProfile(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }
@@ -171,7 +175,7 @@ export default function WalletPage() {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await fetch(`/api/user/${address}/withdraw-token`, {
+      const response = await fetch(`/api/user/${walletAddress}/withdraw-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: parseFloat(tokenWithdrawAmount) }),
@@ -181,7 +185,7 @@ export default function WalletPage() {
       if (data.success) {
         setMessage({ type: 'success', text: `Rút Token thành công! TxHash: ${data.data.txHash}` });
         setTokenWithdrawAmount('');
-        fetchProfile();
+        fetchProfile(walletAddress);
       } else {
         setMessage({ type: 'error', text: data.message });
       }
@@ -235,7 +239,7 @@ export default function WalletPage() {
                           <p className="text-sm text-gray-500">{COMPANY_BANK.name}</p>
                         </div>
                         <p className="text-xs text-gray-500">
-                          Nội dung CK: <span className="font-mono font-medium">{address?.slice(0, 8)}</span>
+                          Nội dung CK: <span className="font-mono font-medium">{address?.slice(0, 8) || 'TNT Stock'}</span>
                         </p>
                       </div>
 

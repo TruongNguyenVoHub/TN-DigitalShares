@@ -51,8 +51,16 @@ enum KycRequestStatus {
 /// Lưu thông tin định danh và ví tiền off-chain (VND)
 model User {
   id            String   @id @default(cuid())
-  walletAddress String   @unique // Địa chỉ ví Metamask (để whitelist)
-  fullName      String // Tên thật trên CCCD (Name Matching với Bank)
+  
+  // ===== Credentials (Optional - cho login username/password) =====
+  username      String?  @unique // Username (optional, cho login bằng username)
+  passwordHash  String?  // Hash của password (bcryptjs) - optional
+  
+  // ===== Wallet & Profile =====
+  walletAddress    String   @unique // Địa chỉ ví Metamask (để whitelist)
+  privateKeyEnc    String?  // Private key encrypted (AES-256) - cho auto-generated wallets
+  walletType       String   @default("EXTERNAL") // EXTERNAL (MetaMask) hoặc MANAGED (tạo bởi hệ thống)
+  fullName         String?  // Tên thật trên CCCD (Name Matching với Bank)
   vndBalance    Float    @default(0) // Số dư VND trong hệ thống (Off-chain)
   tokenBalance  Float    @default(0) // Số dư Token cổ phiếu trong hệ thống (Off-chain)
   kycStatus     KycStatus @default(PENDING)
@@ -63,14 +71,11 @@ model User {
 
   role          String   @default("USER") // USER hoặc ADMIN
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
   transactions Transaction[]
   kycRequests  KYCRequest[]
-
-  
-  sentTransfers     TokenTransfer[] @relation("Sender")
-  receivedTransfers TokenTransfer[] @relation("Receiver")
 }
 
 /// Sổ cái quan trọng nhất, lưu mọi dòng tiền ra vào
@@ -143,24 +148,4 @@ model KYCRequest {
 
   @@index([userId])
   @@index([status])
-}
-/// Lưu lịch sử chuyển Token P2P giữa các user (Do Event Listener ghi vào)
-model TokenTransfer {
-  id          String   @id @default(cuid())
-  
-  fromUserId  String
-  fromUser    User     @relation("Sender", fields: [fromUserId], references: [id])
-  
-  toUserId    String
-  toUser      User     @relation("Receiver", fields: [toUserId], references: [id])
-  
-  amount      Float    // Số lượng Token chuyển
-  symbol      String   @default("TNT") // Mã token
-  txHash      String   // Hash trên blockchain (để tra cứu)
-  blockNumber Int?     // Lưu lại block số mấy (để sort hoặc debug)
-  
-  createdAt   DateTime @default(now())
-
-  @@index([fromUserId])
-  @@index([toUserId])
 }

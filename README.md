@@ -1,82 +1,82 @@
-# 🚀 TN-DigitalShares: Nền tảng Quản trị & Giao dịch Cổ phần Nội bộ (ESOP 4.0)
+# 🚀 TN-DigitalShares: Internal Equity Management & Trading Platform (ESOP 4.0)
 
-***"Đừng để cổ phần của nhân viên chỉ là những con số vô hồn trên Excel."***
+***"Do not let employee equity be soulless numbers on Excel."***
 
-Giải pháp hybrid (Web2 x Blockchain) giúp biến cổ phiếu thưởng (ESOP) thành tài sản số thực sự: minh bạch, thanh khoản cao, an toàn.
+Hybrid (Web2 x Blockchain) solution that turns ESOP grants into real digital assets: transparent, liquid, secure.
 
-### 💥 Nỗi đau hiện tại (Doanh nghiệp & Nhân viên)
-- **Tù mù thông tin**: ESOP chỉ là tờ giấy/PDF, nhân viên không thấy giá trị thực.
-- **"Địa ngục" Excel**: danh sách cổ đông thủ công, dễ sai, dễ bị sửa, mất dữ liệu.
-- **Thanh khoản bằng 0**: muốn bán cổ phần phải chờ duyệt, xử lý giấy tờ rất lâu.
+### 💥 Current Pain Points (Company & Employees)
+- **Opaque information**: ESOP is just a paper/PDF; employees cannot see real value.
+- **Excel hell**: manual cap table, error-prone, easy to tamper, data loss risk.
+- **Zero liquidity**: selling equity requires approvals and slow paperwork.
 
-### 💡 Giải pháp TN-DigitalShares
-- **Hybrid không rào cản**: đăng nhập username/password, hệ thống tự tạo ví (Managed Wallet); hỗ trợ kết nối ví Web3 cho người dùng nâng cao nếu cần.
-- **Giao dịch off-chain tức thì, không phí gas**; tài sản gốc được bảo chứng 1:1 on-chain.
-- **Proof of Reserve**: mọi đợt mint phải có bằng chứng nhập kho; whitelist/KYC bắt buộc.
+### 💡 TN-DigitalShares Solution
+- **Barrier-free hybrid**: username/password login auto-creates a wallet (Managed Wallet); supports Web3 wallet connection for advanced users when needed.
+- **Instant off-chain trades, zero gas**; on-chain supply is 1:1 collateralized.
+- **Proof of Reserve**: every mint requires evidence of stock intake; whitelist/KYC is mandatory.
 
-### 💎 Tại sao Doanh nghiệp CẦN hệ thống này?
+### 💎 Why Companies NEED this system
 
-- **Sở hữu thật, động lực thật:** ESOP không còn là giấy hứa hẹn; nhân viên mở app thấy số dư, biểu đồ, và token trong ví → cảm giác sở hữu rõ ràng, giữ chân nhân tài tốt hơn.
-- **Thanh khoản nội bộ ngay lập tức:** Tạo “sàn thu nhỏ” cho nhân viên mua bán P2P, giải quyết bài toán tài sản chết mà không cần chờ IPO; biến cổ phần thành “ATM nội bộ”.
-- **Dữ liệu sạch, IPO/M&A-ready:** Lịch sử giao dịch bất biến trên blockchain, đối soát tự động; rút ngắn due diligence từ tháng xuống ngày, tăng uy tín với nhà đầu tư.
-- **Huy động vốn từ chính nội bộ:** Bán cổ phần ưu đãi (Stock Purchase Plan) ngay trên app, khai thác nguồn vốn rẻ từ nhân viên, gắn lợi ích “vừa làm vừa là cổ đông”.
-- **Tech-forward, hút nhân tài:** Trải nghiệm không ma sát (login username/password, hệ thống lo ví và gas) giúp doanh nghiệp nhìn hiện đại trong mắt ứng viên Gen Z/tech, nâng thương hiệu tuyển dụng.
+- **Real ownership, real motivation:** ESOP is no longer a promise on paper; employees open the app and see balances, charts, and tokens in their wallet → clear ownership feeling, better retention.
+- **Instant internal liquidity:** Build a mini-exchange for P2P trading among employees without waiting for IPO; turn equity into an “internal ATM.”
+- **Clean data, IPO/M&A-ready:** Immutable transaction history on-chain, automated reconciliation; shorten due diligence from months to days and boost investor trust.
+- **Raise capital from within:** Sell preferential shares (Stock Purchase Plan) right in the app, tap low-cost capital from employees, align “work and be a shareholder.”
+- **Tech-forward, talent magnet:** Frictionless experience (username/password login, system handles wallet and gas) makes the company look modern to Gen Z/tech candidates and strengthens employer brand.
 
-### ⚖️ Pháp lý & Tuân thủ (Legal & Compliance)
+### ⚖️ Legal & Compliance
 
-**Nguyên tắc:** Compliance-first, token nội bộ (Private Placement), không phát hành ra công chúng. Token TNT là “digital twin” của ESOP, không phải tiền tệ giao dịch công khai.
+**Principle:** Compliance-first, internal token (Private Placement), not offered to the public. TNT token is the digital twin of ESOP, not a public payment token.
 
-**Đã xử lý:**
-- **KYC/AML + Smart Contract Whitelist**: chỉ ví đã định danh mới gửi/nhận, truy vết 1:1 người dùng–ví.
-- **Proof of Reserve & Anti-dilution**: mọi mint/burn on-chain kèm bằng chứng, tổng cung minh bạch.
-- **Private Placement**: giới hạn phạm vi nội bộ, không ICO/IPO công khai; tuân thủ Luật DN/CK về phát hành riêng lẻ.
-- **Audit trail & thuế**: lưu toàn bộ lịch sử giao dịch để tính/khai báo thuế TNCN chuyển nhượng vốn (0.1%).
+**Addressed:**
+- **KYC/AML + smart contract whitelist**: only verified wallets can send/receive; 1:1 user-to-wallet traceability.
+- **Proof of Reserve & anti-dilution**: every on-chain mint/burn has evidence; total supply is transparent.
+- **Private Placement**: restricted to internal scope, no public ICO/IPO; adheres to corporate/securities laws on private issuance.
+- **Audit trail & tax**: full transaction history stored for personal income tax on equity transfer (0.1%).
 
-**Tồn tại & hướng xử lý:**
-- **Giá trị pháp lý cuối cùng**: Sổ đăng ký cổ đông gốc vẫn là căn cứ cao nhất; blockchain là bản sao số, định kỳ đồng bộ.
-- **Trung gian thanh toán**: số dư VND là tiền ký quỹ/hạn mức nội bộ, không dùng thanh toán hàng hóa/dịch vụ ngoài; khuyến nghị nạp/rút qua ngân hàng, hệ thống chỉ ghi trạng thái.
-- **Bảo vệ dữ liệu cá nhân**: KYC và private key cần mã hóa (AES-256 đã áp dụng cho key); triển khai thêm encryption-at-rest cho dữ liệu KYC và tuân thủ NĐ 13/2023/NĐ-CP khi lên production.
+**Gaps & mitigations:**
+- **Final legal source of truth**: the original shareholder registry remains the highest authority; blockchain is the digital twin, synced periodically.
+- **Payment intermediary**: VND balance is escrow/internal limit, not for external goods/services; recommend deposit/withdraw via bank, system records status only.
+- **Personal data protection**: KYC and private keys must be encrypted (AES-256 already for keys); add encryption-at-rest for KYC data and comply with Decree 13/2023/ND-CP in production.
 
-**Miễn trừ trách nhiệm:**
-- TN-DigitalShares là SaaS quản trị nội bộ, không phải sàn giao dịch chứng khoán hay tổ chức tín dụng.
-- Token TNT chỉ lưu hành nội bộ, không có giá trị thanh toán bên ngoài và không được bảo lãnh bởi tổ chức tài chính.
-- Doanh nghiệp vận hành chịu trách nhiệm tuân thủ pháp luật, điều lệ công ty và nghĩa vụ thuế khi phát hành/định giá/trao đổi token.
+**Disclaimer:**
+- TN-DigitalShares is an internal governance SaaS, not a securities exchange or credit institution.
+- TNT token circulates internally only, has no external payment value, and is not guaranteed by any financial institution.
+- Operating companies are responsible for legal compliance, corporate charter, and tax obligations when issuing/valuing/trading tokens.
 
-### 🔥 Tính năng chính
-- **🏦 Cổng giao dịch P2P**: mua/bán cổ phần giữa nhân viên với nhau hoặc với công ty.
-- **🔐 Managed Wallet**: tạo ví blockchain tự động khi đăng ký, xoá rào cản kỹ thuật.
-- **📜 Smart Contract**: sổ cái minh bạch, không thể tẩy xoá; kiểm soát phát hành.
-- **👮‍♂️ Whitelist + KYC**: chỉ ví định danh mới được nắm giữ token.
-- **💰 Proof of Reserve**: admin mint token phải có bằng chứng nhập kho.
+### 🔥 Key Features
+- **🏦 P2P trading gateway**: buy/sell equity between employees or with the company.
+- **🔐 Managed Wallet**: auto-create blockchain wallet on registration, removing technical hurdles.
+- **📜 Smart contract**: transparent, tamper-proof ledger; controlled issuance.
+- **👮‍♂️ Whitelist + KYC**: only verified wallets can hold tokens.
+- **💰 Proof of Reserve**: admin minting requires stock intake evidence.
 
 
-### 🛠️ Tech Stack (đúng với code hiện tại)
-- **Blockchain**: Solidity (ERC20 + AccessControl), Hardhat, testnet Sepolia (Ethereum).
-- **App (FE + BE)**: Next.js (App Router) + TypeScript. API routes/route handlers chạy trên Next (không dùng Express riêng).
-- **Data**: Prisma ORM (SQLite cho dev; sẵn sàng chuyển Postgres cho prod).
+### 🛠️ Tech Stack (matches current code)
+- **Blockchain**: Solidity (ERC20 + AccessControl), Hardhat, Sepolia testnet (Ethereum).
+- **App (FE + BE)**: Next.js (App Router) + TypeScript. API routes/route handlers run on Next (no separate Express).
+- **Data**: Prisma ORM (SQLite for dev; ready to switch to Postgres for prod).
 - **Wallet Security**: AES-256 encrypt private key (WALLET_ENCRYPTION_KEY ≥ 32 chars).
 - **UI**: Tailwind CSS UI kit.
 
 ---
 
-## 📋 Quy Trình Triển Khai & Sử Dụng
+## 📋 Deployment & Usage Guide
 
-### **Bước 1: Clone Project & Cài Đặt Thư Viện**
+### **Step 1: Clone Project & Install Dependencies**
 
 ```bash
 # Clone repository
 git clone <your-repo-url>
 cd stock-token
 
-# Cài đặt dependencies
+# Install dependencies
 npm install
 ```
 
 ---
 
-### **Bước 2: Tạo Ví Admin (Managed Wallet)**
+### **Step 2: Create Admin Wallet (Managed Wallet)**
 
-Chạy script để tạo ví Ethereum mới cho admin:
+Run the script to generate a new Ethereum wallet for the admin:
 
 ```bash
 npx tsx scripts/create-wallet.ts
@@ -98,57 +98,57 @@ npx tsx scripts/create-wallet.ts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Lưu lại 2 giá trị này, sẽ dùng ở bước tiếp theo.**
+**Save these two values; you will use them in the next step.**
 
 ---
 
-### **Bước 3: Xin Sepolia ETH**
+### **Step 3: Request Sepolia ETH**
 
-Vào các faucet sau để lấy test ETH cho ví admin vừa tạo:
+Use these faucets to get test ETH for the newly created admin wallet:
 
 - [Sepolia Faucet (Alchemy)](https://sepoliafaucet.com/)
 - [Sepolia Faucet (Infura)](https://www.infura.io/faucet/sepolia)
 - [QuickNode Faucet](https://faucet.quicknode.com/ethereum/sepolia)
 
-Cần ~0.5 ETH cho deploy + verify contract.
+Need ~0.5 ETH for deploy + verify.
 
 ---
 
-### **Bước 4: Cấu Hình Smart Contract & Deploy**
+### **Step 4: Configure Smart Contract & Deploy**
 
-#### **4.1 Cài đặt dependencies trong thư mục contracts**
+#### **4.1 Install dependencies inside contracts folder**
 
 ```bash
 cd contracts
 npm install
 ```
 
-#### **4.2 Tạo file `.env` trong thư mục `contracts/`**
+#### **4.2 Create `.env` inside `contracts/`**
 
 ```bash
 cp env.example .env
 ```
 
-Điền các giá trị:
+Fill in the values:
 
 ```env
-# Sepolia RPC URL (lấy từ Infura/Alchemy/QuickNode)
+# Sepolia RPC URL (from Infura/Alchemy/QuickNode)
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
 
-# Private key admin từ bước 2 (không có 0x prefix)
+# Admin private key from step 2 (without 0x prefix)
 SEPOLIA_PRIVATE_KEY=abcdefgh1234567890...
 
-# Etherscan API key (để verify contract)
+# Etherscan API key (for contract verification)
 ETHERSCAN_API_KEY=YOUR_ETHERSCAN_API_KEY
 
 # Admin wallet address
 DEFAULT_ADMIN=0x1234567890abcdef...
 
-# Addresses for roles (có thể dùng cùng admin wallet lúc test)
+# Addresses for roles (can reuse admin wallet when testing)
 INVENTORY_MANAGER=0x1234567890abcdef...
 COMPLIANCE_ADDRESS=0x1234567890abcdef...
 
-# Chainlink Price Feed (đã có sẵn cho Sepolia)
+# Chainlink Price Feed (available on Sepolia)
 PRICE_ORACLE_ADDRESS=0x694AA1769357215DE4FAC081bf1f309aDC325306
 ```
 
@@ -158,13 +158,13 @@ PRICE_ORACLE_ADDRESS=0x694AA1769357215DE4FAC081bf1f309aDC325306
 # Compile contracts
 npx hardhat compile
 
-# Deploy lên Sepolia (sử dụng Ignition)
+# Deploy to Sepolia (using Ignition)
 npx hardhat ignition deploy ignition/modules/StockToken.ts --network sepolia
 ```
 
-**Lưu lại `CONTRACT_ADDRESS` từ output, sẽ dùng ở bước 6.**
+**Save the `CONTRACT_ADDRESS` from the output for step 6.**
 
-#### **4.4 Verify Contract trên Etherscan**
+#### **4.4 Verify Contract on Etherscan**
 
 ```bash
 npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
@@ -172,74 +172,74 @@ npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
 
 ---
 
-### **Bước 5: Cấu Hình Backend & Database**
+### **Step 5: Configure Backend & Database**
 
-#### **5.1 Quay lại thư mục gốc**
+#### **5.1 Go back to project root**
 
 ```bash
 cd ..
 ```
 
-#### **5.2 Tạo file `.env` ở thư mục gốc**
+#### **5.2 Create `.env` at project root**
 
 ```bash
 cp env.example .env
 ```
 
-Điền các giá trị:
+Fill in the values:
 
 ```env
 # Database (SQLite)
 DATABASE_URL="file:./prisma/dev.db"
 
 # Smart Contract
-CONTRACT_ADDRESS=0x1234567890abcdef...      # Từ bước 4.3
-SEPOLIA_PRIVATE_KEY=abcdefgh1234567890...   # Từ bước 2 (không có 0x prefix)
+CONTRACT_ADDRESS=0x1234567890abcdef...      # From step 4.3
+SEPOLIA_PRIVATE_KEY=abcdefgh1234567890...   # From step 2 (no 0x prefix)
 RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
 
 # Frontend
 NEXT_PUBLIC_CONTRACT_ADDRESS=0x1234567890abcdef...
 NEXT_PUBLIC_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
-NEXT_PUBLIC_TREASURY_ADDRESS=0x1234567890abcdef...  # Có thể dùng admin wallet
+NEXT_PUBLIC_TREASURY_ADDRESS=0x1234567890abcdef...  # Can reuse admin wallet
 
 # Wallet Encryption Key (MUST be >= 32 characters, keep SECRET!)
 WALLET_ENCRYPTION_KEY=your-super-secret-encryption-key-min-32-characters-abcdefghijklmnopqrstuvwxyz
 ```
 
-#### **5.3 Khởi tạo Prisma & tạo Database**
+#### **5.3 Initialize Prisma & create database**
 
 ```bash
 # Generate Prisma client
 npx prisma generate
 
-# Chạy migration (tạo database schema)
+# Run migration (create database schema)
 npx prisma migrate dev --name init
 ```
 
 ---
 
-### **Bước 6: Cập Nhật Admin Wallet trong Seed**
+### **Step 6: Update Admin Wallet in Seed**
 
-Sửa file `prisma/seed.ts`:
+Edit `prisma/seed.ts`:
 
 ```typescript
-// Dòng 32-33, thay các giá trị này bằng ví vừa tạo:
-const adminPublicKey = '0x1234567890abcdef...';  // Public address từ bước 2
-const adminPrivateKey = '0xabcdefgh1234567890...';  // Private key từ bước 2
+// Lines 32-33, replace these with the newly created wallet:
+const adminPublicKey = '0x1234567890abcdef...';  // Public address from step 2
+const adminPrivateKey = '0xabcdefgh1234567890...';  // Private key from step 2
 ```
 
 ---
 
-### **Bước 7: Chạy Seed & Tạo Dữ Liệu Ban Đầu**
+### **Step 7: Run Seed & Create Initial Data**
 
 ```bash
 npx prisma migrate reset
 ```
 
-Lệnh này sẽ:
-- Xóa database cũ
-- Chạy lại migrations
-- Tự động chạy seed (nếu cấu hình trong package.json)
+This command will:
+- Drop the old database
+- Re-run migrations
+- Auto-run seed (if configured in package.json)
 
 **Output:**
 ```
@@ -262,186 +262,186 @@ Lệnh này sẽ:
 
 ---
 
-## 📱 Quy Trình Sử Dụng Hệ Thống
+## 📱 How to Use the System
 
-### **Bước 1: Khởi động ứng dụng**
+### **Step 1: Start the app**
 
 ```bash
 npm run dev
 ```
 
-Truy cập: `http://localhost:3000`
+Visit: `http://localhost:3000`
 
 ---
 
-### **Bước 2: Admin Đăng Nhập & Mint Token**
+### **Step 2: Admin Login & Mint Token**
 
-#### **2.1 Đăng nhập Admin**
+#### **2.1 Admin login**
 
-- Vào trang login: `http://localhost:3000/login`
+- Go to login page: `http://localhost:3000/login`
 - Username: `admin01`
 - Password: `Admin@123456`
 
-#### **2.2 Admin Mint Token (Optional)**
+#### **2.2 Admin mint token (optional)**
 
-Nếu cần mint thêm, admin vào **Admin Dashboard → Token Gateway** để mint.
+If more supply is needed, admin goes to **Admin Dashboard → Token Gateway** to mint.
 
 ---
 
-### **Bước 3: User KYC Verification**
+### **Step 3: User KYC Verification**
 
-#### **3.1 User Đăng Nhập**
+#### **3.1 User login**
 
-- Vào trang login: `http://localhost:3000/login`
+- Go to login page: `http://localhost:3000/login`
 - Username: `user01`
 - Password: `User@123456`
 
-#### **3.2 User Gửi KYC**
+#### **3.2 User submits KYC**
 
-- Vào **User Dashboard → KYC**
+- Go to **User Dashboard → KYC**
 - Upload:
-  - CCCD mặt trước
-  - CCCD mặt sau
-  - Ảnh selfie
-- Gửi yêu cầu (status: **PENDING**)
+   - National ID front
+   - National ID back
+   - Selfie photo
+- Submit request (status: **PENDING**)
 
-#### **3.3 Admin Duyệt KYC**
+#### **3.3 Admin reviews KYC**
 
-- Admin vào **Admin Dashboard → Users → KYC Requests**
-- Review hình ảnh
-- Click **Approve** hoặc **Reject**
-- User status thay đổi thành **VERIFIED** hoặc **REJECTED**
+- Admin goes to **Admin Dashboard → Users → KYC Requests**
+- Review images
+- Click **Approve** or **Reject**
+- User status changes to **VERIFIED** or **REJECTED**
 
 ---
 
-### **Bước 4: User Nạp VND vào Hệ Thống**
+### **Step 4: User Deposits VND into System**
 
-#### **4.1 User Yêu Cầu Nạp**
+#### **4.1 User submits deposit request**
 
-- Vào **User Dashboard → Wallet → Deposit**
-- Nhập số tiền VND muốn nạp
-<!-- - Chọn phương thức thanh toán (VNPay/Bank Transfer) -->
-- Gửi yêu cầu (status: **PENDING**)
+- Go to **User Dashboard → Wallet → Deposit**
+- Enter VND amount to deposit
+<!-- - Choose payment method (VNPay/Bank Transfer) -->
+- Submit request (status: **PENDING**)
 
-#### **4.2 Admin Duyệt Deposit**
+#### **4.2 Admin approves deposit**
 
-- Admin vào **Admin Dashboard → Transactions → Deposits**
-- Xác nhận giao dịch từ ngân hàng
+- Admin goes to **Admin Dashboard → Transactions → Deposits**
+- Confirm bank transaction
 - Click **Approve**
-- User nhận tiền VND vào tài khoản (status: **SUCCESS**)
+- User receives VND in account (status: **SUCCESS**)
 
 ---
 
-### **Bước 5: User Mua Token (Offchain)**
+### **Step 5: User Buys Token (Off-chain)**
 
-#### **5.1 User Chọn Token Mua**
+#### **5.1 User selects token to buy**
 
-- Vào **User Dashboard → Trade → Buy**
-<!-- - Chọn cổ phiếu (TSLA, AAPL, v.v.) -->
-- Nhập số lượng token muốn mua
-- Review giá tính theo: `số lượng × giá hiện tại`
+- Go to **User Dashboard → Trade → Buy**
+<!-- - Choose stock (TSLA, AAPL, etc.) -->
+- Enter quantity to buy
+- Review price: `quantity × current price`
 
-#### **5.2 Xác Nhận Lệnh Mua**
+#### **5.2 Confirm buy order**
 
-- Click **Buy** → Xác nhận
+- Click **Buy** → Confirm
 - **VND balance ↓**
 - **Token balance ↑**
 - Transaction status: **SUCCESS**
 
 ---
 
-### **Bước 6: User Bán Token (Offchain)**
+### **Step 6: User Sells Token (Off-chain)**
 
-#### **6.1 User Chọn Token Bán**
+#### **6.1 User selects token to sell**
 
-- Vào **User Dashboard → Trade → Sell**
-<!-- - Chọn cổ phiếu muốn bán -->
-- Nhập số lượng token
-- Review giá nhận lại: `số lượng × giá hiện tại`
+- Go to **User Dashboard → Trade → Sell**
+<!-- - Choose stock to sell -->
+- Enter quantity
+- Review amount received: `quantity × current price`
 
-#### **6.2 Xác Nhận Lệnh Bán**
+#### **6.2 Confirm sell order**
 
-- Click **Sell** → Xác nhận
+- Click **Sell** → Confirm
 - **Token balance ↓**
 - **VND balance ↑**
 - Transaction status: **SUCCESS**
 
 ---
 
-### **Bước 7: User Rút Token Về Ví Cá Nhân (Onchain)**
+### **Step 7: User Withdraws Token to Personal Wallet (On-chain)**
 
-- Vào **User Dashboard → Wallet → Withdraw Token**
-- Nhập số lượng token muốn rút
-- Nhập ví Ethereum nhận token (hoặc dùng ví được hệ thống tạo sẵn)
-- Xác nhận (Smart contract sẽ transfer token đến ví user)
+- Go to **User Dashboard → Wallet → Withdraw Token**
+- Enter token amount to withdraw
+- Enter recipient Ethereum wallet (or use the system-created wallet)
+- Confirm (smart contract transfers tokens to the user wallet)
 ---
 
-### **Bước 8: User Nạp Lại Token Từ Ví Cá Nhân (Onchain)**
+### **Step 8: User Deposits Token from Personal Wallet (On-chain)**
 
-- Vào **User Dashboard → Wallet → Deposit Token**
-- Nhập số lượng token muốn nạp
-- User cung cấp mã giao dịch on-chain để hệ thống đối soát
-- Xác nhận (Smart contract sẽ transfer token từ ví user)
+- Go to **User Dashboard → Wallet → Deposit Token**
+- Enter token amount to deposit
+- Provide on-chain transaction hash for reconciliation
+- Confirm (smart contract transfers tokens from the user wallet)
 ---
 
-## 🛠️ Lệnh Hữu Ích
+## 🛠️ Useful Commands
 
-| Mục Đích | Lệnh |
+| Purpose | Command |
 |----------|------|
-| Tạo ví mới | `npx tsx scripts/create-wallet.ts` |
+| Create new wallet | `npx tsx scripts/create-wallet.ts` |
 | Reset database & seed | `npx prisma migrate reset` |
-| Chỉ chạy seed | `npx tsx prisma/seed.ts` |
-| Khởi động dev server | `npm run dev` |
+| Run seed only | `npx tsx prisma/seed.ts` |
+| Start dev server | `npm run dev` |
 | Build production | `npm run build` |
 | Compile smart contracts | `cd contracts && npx hardhat compile` |
 | Deploy contract | `cd contracts && npx hardhat ignition deploy ignition/modules/StockToken.ts --network sepolia` |
 
 ---
 
-## 👥 Tài Khoản Mặc Định
+## 👥 Default Accounts
 
-| Vai Trò | Username | Password | Ví | Loại Ví |
+| Role | Username | Password | Wallet | Wallet Type |
 |---------|----------|----------|----|---------| 
-| Admin | `admin01` | `Admin@123456` | Được tạo bên ngoài (bước 2) | Managed |
-| User | `user01` | `User@123456` | Được sinh tự động | Managed |
+| Admin | `admin01` | `Admin@123456` | Created externally (step 2) | Managed |
+| User | `user01` | `User@123456` | Auto-generated | Managed |
 
 ---
 
-## 🔐 Bảo Mật
+## 🔐 Security
 
-- **Private keys** được mã hóa AES-256 trước khi lưu database
-- **WALLET_ENCRYPTION_KEY** phải có >= 32 ký tự, giữ bí mật tuyệt đối
-- Không bao giờ commit file `.env` chứa sensitive data
-
----
-
-## ⚠️ Lưu Ý Quan Trọng
-
-1. **Sepolia ETH**: Chỉ dùng cho test, không có giá trị thực
-2. **Admin Wallet**: Thay đổi SEPOLIA_PRIVATE_KEY trên production
-3. **Database**: Dùng SQLite cho dev, production cần PostgreSQL
-4. **Smart Contract**: Phải verify trên Etherscan trước khi production
-5. **Testnet Faucet**: Sepolia ETH có thể hết, cần xin lại sau một vài ngày
+- **Private keys** are AES-256 encrypted before storing in the database
+- **WALLET_ENCRYPTION_KEY** must be >= 32 characters; keep it strictly secret
+- Never commit `.env` files containing sensitive data
 
 ---
 
-## 📚 Cấu Trúc Dự Án
+## ⚠️ Important Notes
+
+1. **Sepolia ETH**: Test only, no real value
+2. **Admin Wallet**: Rotate SEPOLIA_PRIVATE_KEY in production
+3. **Database**: SQLite for dev; production should use PostgreSQL
+4. **Smart Contract**: Verify on Etherscan before production
+5. **Testnet Faucet**: Sepolia ETH may run out; request again after a few days
+
+---
+
+## 📚 Project Structure
 
 ```
 stock-token/
-├── app/                      # Next.js Frontend
-│   ├── api/                  # API Routes
-│   ├── (auth)/               # Auth Pages
-│   ├── (admin)/              # Admin Pages
-│   └── (user)/               # User Pages
-├── contracts/                # Smart Contracts (Hardhat)
+├── app/                      # Next.js frontend
+│   ├── api/                  # API routes
+│   ├── (auth)/               # Auth pages
+│   ├── (admin)/              # Admin pages
+│   └── (user)/               # User pages
+├── contracts/                # Smart contracts (Hardhat)
 ├── lib/                      # Utilities
-├── prisma/                   # Database Schema
+├── prisma/                   # Database schema
 │   ├── schema.prisma
 │   └── seed.ts
-├── scripts/                  # Helper Scripts
+├── scripts/                  # Helper scripts
 │   └── create-wallet.ts
-└── .env                      # Environment Variables
+└── .env                      # Environment variables
 ```
 
 ---
@@ -449,15 +449,15 @@ stock-token/
 ## 🐛 Troubleshooting
 
 **Q: "WALLET_ENCRYPTION_KEY is not set"**
-- A: Thêm `WALLET_ENCRYPTION_KEY` vào `.env` với >= 32 ký tự
+- A: Add `WALLET_ENCRYPTION_KEY` to `.env` with >= 32 characters
 
 **Q: "Contract deployment failed"**
-- A: Kiểm tra Sepolia ETH balance, cần >= 0.5 ETH
+- A: Check Sepolia ETH balance, need >= 0.5 ETH
 
 **Q: "Database connection error"**
-- A: Chạy `npx prisma migrate dev` để tạo database
+- A: Run `npx prisma migrate dev` to create the database
 
 **Q: "Private key error"**
-- A: Kiểm tra `SEPOLIA_PRIVATE_KEY` không có `0x` prefix
+- A: Ensure `SEPOLIA_PRIVATE_KEY` has no `0x` prefix
 
 ---

@@ -25,6 +25,8 @@ enum TransactionType {
   BUY_STOCK // Dùng VND mua Token
   SELL_STOCK // Bán Token đổi VND
 
+  BONUS_TOKEN // Thưởng token off-chain cho nhân viên
+
   WITHDRAW_TOKEN_ONCHAIN // Rút Token về ví
   DEPOSIT_TOKEN_ONCHAIN  // Nạp Token lên sàn
 }

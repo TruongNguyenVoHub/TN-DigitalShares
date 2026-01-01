@@ -1,5 +1,8 @@
 import { TransactionType } from "@/app/generated/prisma";
+import { verifyPassword } from "@/lib/auth-utils";
+import { encryptPrivateKey, formatPrivateKey, isValidPrivateKey } from "@/lib/crypto-utils";
 import { kycRequestRepository, stockTokenRepository, transactionRepository, TransferParams, userRepository, type SetWhitelistedParams } from "@/repositories";
+import { privateKeyToAccount } from "viem/accounts";
 interface BankInfo {
   bankName: string;
   accountNumber: string;
@@ -200,6 +203,113 @@ export class UserService {
                     refCode: tx.refCode || undefined,
                     createdAt: tx.createdAt.toISOString(),
                 })),
+            },
+        };
+    }
+
+    async changeWallet(currentWallet: string, password: string, newWallet: string, newPrivateKey?: string): Promise<ApiResponse<{ walletAddress: string; walletType: string }>> {
+        if (!currentWallet || !password || !newWallet) {
+            return {
+                success: false,
+                status: 400,
+                message: "Thiếu thông tin ví hoặc mật khẩu",
+            };
+        }
+
+        const normalizedCurrent = currentWallet.toLowerCase();
+        const normalizedNew = newWallet.toLowerCase();
+
+        if (normalizedCurrent === normalizedNew) {
+            return {
+                success: false,
+                status: 400,
+                message: "Ví mới phải khác ví hiện tại",
+            };
+        }
+
+        const user = await userRepository.findByWalletAddress(normalizedCurrent);
+        if (!user) {
+            return {
+                success: false,
+                status: 404,
+                message: "User not found",
+            };
+        }
+
+        if (!user.passwordHash) {
+            return {
+                success: false,
+                status: 400,
+                message: "User chưa thiết lập mật khẩu",
+            };
+        }
+
+        const isPasswordValid = await verifyPassword(password, user.passwordHash);
+        if (!isPasswordValid) {
+            return {
+                success: false,
+                status: 401,
+                message: "Mật khẩu không đúng",
+            };
+        }
+
+        const isTargetUsed = await userRepository.existsByWalletAddress(normalizedNew);
+        if (isTargetUsed) {
+            return {
+                success: false,
+                status: 409,
+                message: "Địa chỉ ví mới đã được sử dụng",
+            };
+        }
+
+        let walletType = "EXTERNAL";
+        let privateKeyEnc: string | null = null;
+
+        if (newPrivateKey) {
+            if (!isValidPrivateKey(newPrivateKey)) {
+                return {
+                    success: false,
+                    status: 400,
+                    message: "Private key không hợp lệ",
+                };
+            }
+
+            const formattedKey = formatPrivateKey(newPrivateKey);
+            const account = privateKeyToAccount(formattedKey as `0x${string}`);
+            const derivedAddress = account.address.toLowerCase();
+
+            if (derivedAddress !== normalizedNew) {
+                return {
+                    success: false,
+                    status: 400,
+                    message: "Địa chỉ ví mới không khớp với private key",
+                };
+            }
+
+            privateKeyEnc = encryptPrivateKey(formattedKey);
+            walletType = "MANAGED";
+        }
+
+        // Whitelist new wallet on-chain (keep old wallet as-is)
+        await stockTokenRepository.setWhitelistedAndWait({
+            account: normalizedNew as `0x${string}`,
+            status: true,
+        });
+
+        await userRepository.update(user.id, {
+            walletAddress: normalizedNew,
+            walletType,
+            privateKeyEnc,
+            isWhitelisted: true,
+        });
+
+        return {
+            success: true,
+            status: 200,
+            message: "Đổi ví thành công và đã whitelist ví mới",
+            data: {
+                walletAddress: normalizedNew,
+                walletType,
             },
         };
     }

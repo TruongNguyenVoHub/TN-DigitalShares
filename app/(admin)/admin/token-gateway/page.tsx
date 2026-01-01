@@ -1,9 +1,9 @@
 'use client';
 
-import { Badge, Button, Card, Modal, ToastContainer, useToast } from '@/components/ui';
+import { Badge, Button, Card, Input, Modal, ToastContainer, useToast } from '@/components/ui';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 
 interface TokenTransaction {
   id: string;
@@ -39,6 +39,11 @@ export default function TokenGatewayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isBonusSubmitting, setIsBonusSubmitting] = useState(false);
+
+  const [bonusWallet, setBonusWallet] = useState('');
+  const [bonusAmount, setBonusAmount] = useState('');
+  const [bonusNote, setBonusNote] = useState('');
 
   const [data, setData] = useState<GatewayData>({
     deposits: [],
@@ -71,6 +76,48 @@ export default function TokenGatewayPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleSubmitBonus = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const amount = Number(bonusAmount);
+    if (!bonusWallet || !Number.isFinite(amount) || amount <= 0) {
+      error('Vui lòng nhập ví và số token hợp lệ (>0)');
+      return;
+    }
+
+    setIsBonusSubmitting(true);
+    try {
+      const response = await fetch('/api/admin/token-gateway/bonus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: bonusWallet.trim(),
+          amountToken: amount,
+          note: bonusNote.trim() || undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        success('Đã thưởng token thành công');
+        setBonusWallet('');
+        setBonusAmount('');
+        setBonusNote('');
+        fetchData();
+      } else {
+        error(result.message || 'Không thể thưởng token');
+      }
+    } catch (err) {
+      console.error('Error granting bonus token:', err);
+      error('Có lỗi xảy ra, vui lòng thử lại');
+    } finally {
+      setIsBonusSubmitting(false);
+    }
+  };
 
   const pendingWithdraws = data.withdraws.filter(w => w.status === 'PENDING');
 
@@ -117,6 +164,44 @@ export default function TokenGatewayPage() {
 
   return (
     <>
+      {/* Bonus Grant */}
+      <Card className="mb-6">
+        <h3 className="font-semibold text-gray-900 mb-4">Thưởng Token cho nhân viên (off-chain)</h3>
+        <form className="grid grid-cols-1 md:grid-cols-3 gap-4" onSubmit={handleSubmitBonus}>
+          <Input
+            label="Wallet Address"
+            placeholder="0x..."
+            value={bonusWallet}
+            onChange={(e) => setBonusWallet(e.target.value)}
+            required
+          />
+          <Input
+            label="Số lượng Token"
+            placeholder="Ví dụ: 100"
+            type="number"
+            min="0"
+            step="0.0001"
+            value={bonusAmount}
+            onChange={(e) => setBonusAmount(e.target.value)}
+            required
+          />
+          <div className="flex flex-col gap-2 md:col-span-1">
+            <label className="text-sm font-medium text-gray-700">Ghi chú (optional)</label>
+            <textarea
+              className="w-full h-12 px-4 py-2 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-900"
+              placeholder="VD: Thưởng quý"
+              value={bonusNote}
+              onChange={(e) => setBonusNote(e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-3 flex justify-end">
+            <Button type="submit" variant="success" isLoading={isBonusSubmitting}>
+              Thưởng Token
+            </Button>
+          </div>
+        </form>
+      </Card>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>

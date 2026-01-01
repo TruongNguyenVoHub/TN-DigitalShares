@@ -146,6 +146,20 @@ export const userRepository = {
   },
 
   /**
+   * Tăng/giảm số dư token off-chain
+   */
+  async incrementTokenBalance(id: string, amount: number): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        tokenBalance: {
+          increment: amount,
+        },
+      },
+    })
+  },
+
+  /**
    * Cập nhật trạng thái KYC
    */
   async updateKycStatus(id: string, status: KycStatus): Promise<User> {

@@ -1,33 +1,41 @@
 # 🚀 TN-DigitalShares: Nền tảng Quản trị & Giao dịch Cổ phần Nội bộ (ESOP 4.0)
 
-"Đừng để cổ phần của nhân viên chỉ là những con số vô hồn trên Excel."
+***"Đừng để cổ phần của nhân viên chỉ là những con số vô hồn trên Excel."***
 
 Giải pháp hybrid (Web2 x Blockchain) giúp biến cổ phiếu thưởng (ESOP) thành tài sản số thực sự: minh bạch, thanh khoản cao, an toàn.
 
 ### 💥 Nỗi đau hiện tại (Doanh nghiệp & Nhân viên)
-- Tù mù thông tin: ESOP chỉ là tờ giấy/PDF, nhân viên không thấy giá trị thực.
-- "Địa ngục" Excel: danh sách cổ đông thủ công, dễ sai, dễ bị sửa, mất dữ liệu.
-- Thanh khoản bằng 0: muốn bán cổ phần phải chờ duyệt, xử lý giấy tờ rất lâu.
+- **Tù mù thông tin**: ESOP chỉ là tờ giấy/PDF, nhân viên không thấy giá trị thực.
+- **"Địa ngục" Excel**: danh sách cổ đông thủ công, dễ sai, dễ bị sửa, mất dữ liệu.
+- **Thanh khoản bằng 0**: muốn bán cổ phần phải chờ duyệt, xử lý giấy tờ rất lâu.
 
 ### 💡 Giải pháp TN-DigitalShares
-- Hybrid không rào cản: đăng nhập username/password, hệ thống tự tạo ví (Managed Wallet); vẫn hỗ trợ ví ngoài nếu cần.
-- Giao dịch off-chain tức thì, không phí gas; tài sản gốc được bảo chứng 1:1 on-chain.
-- Proof of Reserve: mọi đợt mint phải có bằng chứng nhập kho; whitelist/KYC bắt buộc.
+- **Hybrid không rào cản**: đăng nhập username/password, hệ thống tự tạo ví (Managed Wallet); hỗ trợ kết nối ví Web3 cho người dùng nâng cao nếu cần.
+- **Giao dịch off-chain tức thì, không phí gas**; tài sản gốc được bảo chứng 1:1 on-chain.
+- **Proof of Reserve**: mọi đợt mint phải có bằng chứng nhập kho; whitelist/KYC bắt buộc.
+
+### 💎 Tại sao Doanh nghiệp CẦN hệ thống này?
+
+- **Sở hữu thật, động lực thật:** ESOP không còn là giấy hứa hẹn; nhân viên mở app thấy số dư, biểu đồ, và token trong ví → cảm giác sở hữu rõ ràng, giữ chân nhân tài tốt hơn.
+- **Thanh khoản nội bộ ngay lập tức:** Tạo “sàn thu nhỏ” cho nhân viên mua bán P2P, giải quyết bài toán tài sản chết mà không cần chờ IPO; biến cổ phần thành “ATM nội bộ”.
+- **Dữ liệu sạch, IPO/M&A-ready:** Lịch sử giao dịch bất biến trên blockchain, đối soát tự động; rút ngắn due diligence từ tháng xuống ngày, tăng uy tín với nhà đầu tư.
+- **Huy động vốn từ chính nội bộ:** Bán cổ phần ưu đãi (Stock Purchase Plan) ngay trên app, khai thác nguồn vốn rẻ từ nhân viên, gắn lợi ích “vừa làm vừa là cổ đông”.
+- **Tech-forward, hút nhân tài:** Trải nghiệm không ma sát (login username/password, hệ thống lo ví và gas) giúp doanh nghiệp nhìn hiện đại trong mắt ứng viên Gen Z/tech, nâng thương hiệu tuyển dụng.
 
 ### ⚖️ Pháp lý & Tuân thủ (Legal & Compliance)
 
 **Nguyên tắc:** Compliance-first, token nội bộ (Private Placement), không phát hành ra công chúng. Token TNT là “digital twin” của ESOP, không phải tiền tệ giao dịch công khai.
 
 **Đã xử lý:**
-- KYC/AML + Smart Contract Whitelist: chỉ ví đã định danh mới gửi/nhận, truy vết 1:1 người dùng–ví.
-- Proof of Reserve & Anti-dilution: mọi mint/burn on-chain kèm bằng chứng, tổng cung minh bạch.
-- Private Placement: giới hạn phạm vi nội bộ, không ICO/IPO công khai; tuân thủ Luật DN/CK về phát hành riêng lẻ.
-- Audit trail & thuế: lưu toàn bộ lịch sử giao dịch để tính/khai báo thuế TNCN chuyển nhượng vốn (0.1%).
+- **KYC/AML + Smart Contract Whitelist**: chỉ ví đã định danh mới gửi/nhận, truy vết 1:1 người dùng–ví.
+- **Proof of Reserve & Anti-dilution**: mọi mint/burn on-chain kèm bằng chứng, tổng cung minh bạch.
+- **Private Placement**: giới hạn phạm vi nội bộ, không ICO/IPO công khai; tuân thủ Luật DN/CK về phát hành riêng lẻ.
+- **Audit trail & thuế**: lưu toàn bộ lịch sử giao dịch để tính/khai báo thuế TNCN chuyển nhượng vốn (0.1%).
 
 **Tồn tại & hướng xử lý:**
-- Giá trị pháp lý cuối cùng: Sổ đăng ký cổ đông gốc vẫn là căn cứ cao nhất; blockchain là bản sao số, định kỳ đồng bộ.
-- Trung gian thanh toán: số dư VND là tiền ký quỹ/hạn mức nội bộ, không dùng thanh toán hàng hóa/dịch vụ ngoài; khuyến nghị nạp/rút qua ngân hàng, hệ thống chỉ ghi trạng thái.
-- Bảo vệ dữ liệu cá nhân: KYC và private key cần mã hóa (AES-256 đã áp dụng cho key); triển khai thêm encryption-at-rest cho dữ liệu KYC và tuân thủ NĐ 13/2023/NĐ-CP khi lên production.
+- **Giá trị pháp lý cuối cùng**: Sổ đăng ký cổ đông gốc vẫn là căn cứ cao nhất; blockchain là bản sao số, định kỳ đồng bộ.
+- **Trung gian thanh toán**: số dư VND là tiền ký quỹ/hạn mức nội bộ, không dùng thanh toán hàng hóa/dịch vụ ngoài; khuyến nghị nạp/rút qua ngân hàng, hệ thống chỉ ghi trạng thái.
+- **Bảo vệ dữ liệu cá nhân**: KYC và private key cần mã hóa (AES-256 đã áp dụng cho key); triển khai thêm encryption-at-rest cho dữ liệu KYC và tuân thủ NĐ 13/2023/NĐ-CP khi lên production.
 
 **Miễn trừ trách nhiệm:**
 - TN-DigitalShares là SaaS quản trị nội bộ, không phải sàn giao dịch chứng khoán hay tổ chức tín dụng.
@@ -35,17 +43,19 @@ Giải pháp hybrid (Web2 x Blockchain) giúp biến cổ phiếu thưởng (ESO
 - Doanh nghiệp vận hành chịu trách nhiệm tuân thủ pháp luật, điều lệ công ty và nghĩa vụ thuế khi phát hành/định giá/trao đổi token.
 
 ### 🔥 Tính năng chính
-- 🏦 Sàn P2P nội bộ: mua/bán cổ phần giữa nhân viên với nhau hoặc với công ty.
-- 🔐 Managed Wallet: tạo ví blockchain tự động khi đăng ký, xoá rào cản kỹ thuật.
-- 📜 Smart Contract: sổ cái minh bạch, không thể tẩy xoá; kiểm soát phát hành.
-- 👮‍♂️ Whitelist + KYC: chỉ ví định danh mới được nắm giữ token.
-- 💰 Proof of Reserve: admin mint token phải có bằng chứng nhập kho.
+- **🏦 Cổng giao dịch P2P**: mua/bán cổ phần giữa nhân viên với nhau hoặc với công ty.
+- **🔐 Managed Wallet**: tạo ví blockchain tự động khi đăng ký, xoá rào cản kỹ thuật.
+- **📜 Smart Contract**: sổ cái minh bạch, không thể tẩy xoá; kiểm soát phát hành.
+- **👮‍♂️ Whitelist + KYC**: chỉ ví định danh mới được nắm giữ token.
+- **💰 Proof of Reserve**: admin mint token phải có bằng chứng nhập kho.
+
 
 ### 🛠️ Tech Stack (đúng với code hiện tại)
-- Blockchain: Solidity (ERC20 + AccessControl), Hardhat, testnet Sepolia (Ethereum).
-- Backend: Node.js + TypeScript, Prisma ORM (SQLite dev; có thể lên Postgres prod).
-- Wallet Security: AES-256 encrypt private key (WALLET_ENCRYPTION_KEY ≥ 32 chars).
-- Frontend: Next.js (App Router), Tailwind CSS UI kit.
+- **Blockchain**: Solidity (ERC20 + AccessControl), Hardhat, testnet Sepolia (Ethereum).
+- **App (FE + BE)**: Next.js (App Router) + TypeScript. API routes/route handlers chạy trên Next (không dùng Express riêng).
+- **Data**: Prisma ORM (SQLite cho dev; sẵn sàng chuyển Postgres cho prod).
+- **Wallet Security**: AES-256 encrypt private key (WALLET_ENCRYPTION_KEY ≥ 32 chars).
+- **UI**: Tailwind CSS UI kit.
 
 ---
 
@@ -310,7 +320,7 @@ Nếu cần mint thêm, admin vào **Admin Dashboard → Token Gateway** để m
 
 - Vào **User Dashboard → Wallet → Deposit**
 - Nhập số tiền VND muốn nạp
-- Chọn phương thức thanh toán (VNPay/Bank Transfer)
+<!-- - Chọn phương thức thanh toán (VNPay/Bank Transfer) -->
 - Gửi yêu cầu (status: **PENDING**)
 
 #### **4.2 Admin Duyệt Deposit**
@@ -327,7 +337,7 @@ Nếu cần mint thêm, admin vào **Admin Dashboard → Token Gateway** để m
 #### **5.1 User Chọn Token Mua**
 
 - Vào **User Dashboard → Trade → Buy**
-- Chọn cổ phiếu (TSLA, AAPL, v.v.)
+<!-- - Chọn cổ phiếu (TSLA, AAPL, v.v.) -->
 - Nhập số lượng token muốn mua
 - Review giá tính theo: `số lượng × giá hiện tại`
 
@@ -345,7 +355,7 @@ Nếu cần mint thêm, admin vào **Admin Dashboard → Token Gateway** để m
 #### **6.1 User Chọn Token Bán**
 
 - Vào **User Dashboard → Trade → Sell**
-- Chọn cổ phiếu muốn bán
+<!-- - Chọn cổ phiếu muốn bán -->
 - Nhập số lượng token
 - Review giá nhận lại: `số lượng × giá hiện tại`
 
@@ -360,38 +370,18 @@ Nếu cần mint thêm, admin vào **Admin Dashboard → Token Gateway** để m
 
 ### **Bước 7: User Rút Token Về Ví Cá Nhân (Onchain)**
 
-#### **7.1 User Rút Token**
-
 - Vào **User Dashboard → Wallet → Withdraw Token**
 - Nhập số lượng token muốn rút
 - Nhập ví Ethereum nhận token (hoặc dùng ví được hệ thống tạo sẵn)
-
-#### **7.2 Xác Nhận Rút (Admin Approval Required)**
-
-- Admin vào **Admin Dashboard → Transactions → Token Withdrawals**
-- Review chi tiết rút
-- Click **Approve**
-- Smart contract burn token trên hệ thống
-- Token được chuyển sang blockchain (status: **SUCCESS**)
-- Blockchain transaction hash được lưu
-
+- Xác nhận (Smart contract sẽ transfer token đến ví user)
 ---
 
 ### **Bước 8: User Nạp Lại Token Từ Ví Cá Nhân (Onchain)**
 
-#### **8.1 User Nạp Token Lại**
-
 - Vào **User Dashboard → Wallet → Deposit Token**
 - Nhập số lượng token muốn nạp
+- User cung cấp mã giao dịch on-chain để hệ thống đối soát
 - Xác nhận (Smart contract sẽ transfer token từ ví user)
-
-#### **8.2 Xác Nhận Nạp (Admin Approval Required)**
-
-- Admin vào **Admin Dashboard → Transactions → Token Deposits**
-- Review chi tiết nạp
-- Click **Confirm**
-- Token được mint lại trên hệ thống (status: **SUCCESS**)
-
 ---
 
 ## 🛠️ Lệnh Hữu Ích

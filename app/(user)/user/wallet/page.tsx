@@ -412,10 +412,10 @@ export default function WalletPage() {
                 <div className="space-y-4">
                   <div className="bg-orange-50 rounded-xl p-4">
                     <p className="text-sm text-gray-600">
-                      Token sẽ được chuyển về ví MetaMask của bạn:
+                      Token sẽ được chuyển về ví của bạn:
                     </p>
                     <p className="font-mono text-sm text-gray-900 mt-1 break-all">
-                      {address}
+                      {walletAddress || 'Chưa xác định ví — vui lòng đăng nhập lại'}
                     </p>
                   </div>
 

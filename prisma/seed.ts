@@ -108,8 +108,8 @@ async function main() {
   console.log(`   - Password: ${password}`);
   console.log(`   - VND Balance: ${user.vndBalance.toLocaleString()} VND\n`);
 
-  // ===== 3. Whitelist both wallets on smart contract =====
-  console.log('🔗 Whitelisting wallets on smart contract...');
+  // ===== 3. Whitelist admin wallet on smart contract =====
+  console.log('🔗 Whitelisting admin wallet on smart contract...');
   try {
     const stockTokenRepository = new StockTokenRepository();
     
@@ -120,18 +120,11 @@ async function main() {
       status: true
     });
     console.log(`   ✅ Admin whitelisted - TX: ${adminWhitelistTx}`);
+    console.log('   ℹ️ User wallet will be whitelisted after KYC approval.');
     
-    // Whitelist user wallet
-    console.log(`   - Whitelisting user wallet: ${user.walletAddress}`);
-    const userWhitelistTx = await stockTokenRepository.setWhitelisted({
-      account: user.walletAddress as `0x${string}`,
-      status: true
-    });
-    console.log(`   ✅ User whitelisted - TX: ${userWhitelistTx}\n`);
-    
-    // Update database to mark as whitelisted
-    await prisma.user.updateMany({
-      where: { id: { in: [admin.id, user.id] } },
+    // Update database to mark admin as whitelisted
+    await prisma.user.update({
+      where: { id: admin.id },
       data: { isWhitelisted: true }
     });
     

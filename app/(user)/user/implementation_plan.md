@@ -516,7 +516,7 @@ lib/
 
 ### 📚 Kiến thức cần học
 
-#### 4.1 Navigation (PHỎNG VẤN RẤT HAY HỎI ⚡⚡)
+#### 4.1 Navigation (PHỎNG VẤN RẤT HAY HỎI ⚡⚡) **-xong**
 
 ```dart
 // ===== CÁCH 1: Navigator 1.0 (Imperative) =====
@@ -544,9 +544,12 @@ final goRouter = GoRouter(
     GoRoute(path: '/wallet-settings', builder: (_, __) => WalletSettingsPage()),
   ],
 );
+//sử dụng
+context.push('/dashboard');
+context.pop(context);
 ```
 
-#### 4.2 Bottom Navigation Shell (tương đương layout.tsx)
+#### 4.2 Bottom Navigation Shell (tương đương layout.tsx) -xong
 
 ```dart
 // Mapping từ layout.tsx:

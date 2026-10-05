@@ -6,6 +6,7 @@ import '../widgets/app_button.dart';
 import '../widgets/app_card.dart';
 import '../widgets/app_input.dart';
 import '../widgets/app_modal.dart';
+import 'package:go_router/go_router.dart';
 
 class PlaygroundScreen extends StatelessWidget {
   @override
@@ -40,6 +41,13 @@ class PlaygroundScreen extends StatelessWidget {
 
           Text('4.Modal'),
           AppModal(title: "Modal", onPressed: () => {}),
+          Divider(),
+
+          Text('5.Chuyển trang'),
+          AppButton(
+            title: 'test_screen',
+            onPressed: () => {context.push('/test_screen')},
+          ),
         ],
       ),
     );
